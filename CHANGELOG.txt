@@ -1,0 +1,99 @@
+﻿1.3.1 (Changes since 1.3.0b2) 2010-09-12
+
+- Be more conservative about returning alternate names in the results (London is no longer forced to City of Westminster)
+- Back of widget now has map icon to show location on map
+- About line simplified
+- Front of widget shows icon for nautical/astronomical twilight when not in clock-only mode
+- New about page completed
+- Added licensing details everywhere
+- Corrected a few latitude/longitude errors noticed in the places database
+- Database lookup debugging messages suppressed for release builds
+- Bumped version to 1.3.1 since all versions of 1.3.0 were betas but one escaped into the wild without the beta suffix.
+- Pointed links to new project page
+
+
+1.3.0b2 (Changes since 1.3.0b1) 2010-08-31
+
+- Esc, Return, Enter work on front side now
+- Extra lookups are suppressed
+- Last database lookup is now cached
+
+
+1.3.0b1 (Changes since 1.2.3) 2010-08-31
+
+- Development restarted with new developer
+- Works on Snow Leopard
+- Esc, Return, Enter work on back side
+- Back side controls no longer drag widget (which means text in city box is no mouse-selectable)
+- Places database now included with widget -- no server required anymore!
+- City lookups improved
+- Places database dump cleaned up to be usable (was in mangled character set)
+- Widget is now approximately 20MB when distributed in order to include 2 million+ place name lat/lon database
+- Cleaned up some __MyCompanyName__ placeholders
+- Enforce 10.4.3 requirement by adding LSMinimumSystemVersion key to helper
+- New about page link added
+- Old link on back of widget re-pointed into Internet Archive
+- Added release dates to CHANGELOG
+
+
+1.2.3 Sources Released 2008-03-12
+
+- MIT License
+- Includes Objective-C Cocoa portion
+- Includes places database
+- Includes Photoshop sources
+- Includes PHP server script
+
+
+1.2.3 (Changes since 1.2.2) 2007-10-17
+
+- Works on Leopard
+- Fixed layout problems when short time format includes "Uhr"
+- Slightly increased contrast between clock hand and daytime portion of clock face
+
+
+1.2.2 (Changes since 1.2.1) 2006-06-01
+
+- Fixed behavior at extreme latitudes
+- Translated into Polish (Sławomir Dąbek)
+
+
+1.2.1 (Changes since 1.2) 2006-04-24
+
+- Translated into Swedish (Calle Bäckström)
+- Corrected spelling of Wisconsin
+
+
+1.2 (Changes since 1.1b3) 2006-02-17
+
+- State properly displayed on back
+- Minor changes to Dutch translation
+
+
+1.1b3 (Changes since 1.1b2) 2006-02-?? (between 06 and 16)
+
+- Added nautical and astronomical twilight
+- Translated into Dutch (Joram Hoekman) and Danish (Niels Danielsen)
+- Improved Norwegian translation
+- Uses city in your Address Book at startup; defaults to Cupertino on failure
+- Preferences display correctly after restart or logout
+
+
+1.1b2 (Changes since 1.0.1) 2006-02-03
+
+- Choose from over two million cities and towns worldwide
+- Translated into French (Jean-Marc Gras), German (me), Italian (Nicola "ATMB" Del Monaco), and Norwegian (Kris Skjervold)
+- Click on the clock to hide the digital times
+- Updates every five minutes
+- Twilight times are more accurate
+
+
+1.0.1 (Changes since 1.0) 2006-01-12
+
+- Times are displayed in the user's preferred format (AM/PM or 24-hour), set in System Preferences → International → Format (thanks to Bram ten Haaf and Paul Janssen)
+- Fixed weird times in Australia and possibly other places (thanks to Matt Hiser)
+- Fixed negative times in the Pacific time zone and possibly other time zones (thanks to Buff Allen)
+- Times with two-digit hours are formatted properly when using AM/PM-style times
+
+
+1.0 Initial Release 2006-01-10
