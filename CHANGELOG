@@ -1,0 +1,41 @@
+﻿1.2.3 (Changes since 1.2.2)
+
+- Works on Leopard
+- Fixed layout problems when short time format includes "Uhr"
+- Slightly increased contrast between clock hand and daytime portion of clock face
+
+
+1.2.2 (Changes since 1.2.1)
+
+- Fixed behavior at extreme latitudes
+- Translated into Polish (Sławomir Dąbek)
+
+
+1.2.1 (Changes since 1.2)
+
+- Translated into Swedish (Calle Bäckström)
+- Corrected spelling of Wisconsin
+
+
+1.2 (Changes since 1.1b3)
+
+- State properly displayed on back
+- Minor changes to Dutch translation
+
+
+1.1b3 (Changes since 1.1b2)
+
+- Added nautical and astronomical twilight
+- Translated into Dutch (Joram Hoekman) and Danish (Niels Danielsen)
+- Improved Norwegian translation
+- Uses city in your Address Book at startup; defaults to Cupertino on failure
+- Preferences display correctly after restart or logout
+
+
+1.1b2 (Changes since 1.0.1)
+
+- Choose from over two million cities and towns worldwide
+- Translated into French (Jean-Marc Gras), German (me), Italian (Nicola "ATMB" Del Monaco), and Norwegian (Kris Skjervold)
+- Click on the clock to hide the digital times
+- Updates every five minutes
+- Twilight times are more accurate

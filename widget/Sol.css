@@ -1,0 +1,159 @@
+body
+{
+	font: 10pt 'Helvetica';
+	color: white;
+	margin: 0;
+}
+
+#front
+{
+	display: block;
+	margin: 0;
+	padding: 19px 0 0 24px;
+	width: 248px;
+	height: 144px;
+}
+
+#bgLeft,
+#bgCenter,
+#bgRight
+{
+	position: absolute;
+	top: 0;
+	z-index: -1;
+}
+
+#bgLeft
+{
+	left: 0;
+}
+
+#bgCenter
+{
+	left: 130px;
+	width: 123px;
+	height: 163px;
+}
+
+#bgRight
+{
+	left: 253px;
+}
+
+#back
+{
+	display: none;
+	background: url('BackgroundBack.png') no-repeat top;
+	font-size: 8pt;
+	font-weight: bold;
+	margin: 0;
+	padding: 14px 24px 0 24px;
+	width: 224px;
+	height: 149px;
+}
+
+#tableWrapper
+{
+	display: table;
+	width: 117px;
+}
+
+#mainTable
+{
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#mainTable th
+{
+	padding-right: 0.25em;
+}
+
+th
+{
+	text-align: right;
+	white-space: nowrap;
+}
+
+#manualEntry
+{
+	display: none;
+}
+
+canvas
+{
+	float: left;
+	margin-right: 0.75em;
+}
+
+#infoButton
+{
+	position: absolute;
+	right: 26px;
+	bottom: 31px;
+}
+
+#doneButton
+{
+	position: absolute;
+	right: 19px;
+	bottom: 24px;
+}
+
+#about
+{
+	position: absolute;
+	left: 24px;
+	bottom: 27px;
+}
+
+.link
+{
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+a, a:hover, a:active, a:visited
+{
+	color: white;
+}
+
+#placeName
+{
+	position: absolute;
+	left: 24px;
+	bottom: 23px;
+	clear: both;
+	text-align: center;
+	width: 224px;
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 9pt;
+	opacity: 0.6667;
+	margin-top: 10px;
+}
+
+#bandAid
+{
+	position: absolute;
+	top: 66px;
+	left: 126px;
+	display: none;
+}
+
+#settingsTable
+{
+	border-spacing: 0;
+}
+
+#cityRow th,
+#cityRow td
+{
+	padding-bottom: 2px;
+}
+
+#twilightRow th,
+#twilightRow td
+{
+	border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
