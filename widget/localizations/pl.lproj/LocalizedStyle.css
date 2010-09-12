@@ -1,0 +1,31 @@
+/* This adds 49 pixels to all widths. */
+
+#front
+{
+	width: 297px;
+}
+
+#bgCenter
+{
+	width: 172px
+}
+
+#bgRight
+{
+	left: 302px
+}
+
+#back
+{
+	width: 273px;
+}
+
+#tableWrapper
+{
+	width: 166px;
+}
+
+#placeName
+{
+	width: 273px;
+}

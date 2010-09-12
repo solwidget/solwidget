@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AllowNetworkAccess</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>Sol</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.captaindan.Sol</string>
+	<key>CFBundleName</key>
+	<string>Sol</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.2.3</string>
+	<key>CFBundleVersion</key>
+	<string>1.2.3</string>
+	<key>CloseBoxInsetX</key>
+	<integer>9</integer>
+	<key>CloseBoxInsetY</key>
+	<integer>4</integer>
+	<key>MainHTML</key>
+	<string>Sol.html</string>
+	<key>Plugin</key>
+	<string>TimeZoneHelper.bundle</string>
+</dict>
+</plist>

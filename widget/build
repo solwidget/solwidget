@@ -1,0 +1,11 @@
+#!/bin/sh
+
+mkdir Sol.wdgt
+cp Sol.html       \
+   Sol.css        \
+   Sol.js         \
+   Images/*.png   \
+   Info.plist     \
+   Sol.wdgt/
+cp -r localizations/*.lproj Sol.wdgt/
+cp -r TimeZoneHelper/build/Release/TimeZoneHelper.bundle Sol.wdgt/
