@@ -21,4 +21,5 @@ localizedStrings['Nautical']     = 'Nautico';
 localizedStrings['Astronomical'] = 'Astronomico';
 
 localizedStrings['by']           = 'di';
+localizedStrings['About']        = 'Informazioni su';
 localizedStrings['Done']         = 'Fine';

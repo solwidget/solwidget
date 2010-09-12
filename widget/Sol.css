@@ -1,159 +1,211 @@
+/*
+
+Sol Widget CSS
+Copyright (C) 2006 Daniel S. Neumeyer
+Portions Copyright (C) 2010 Kyle J. McKay
+All rights reserved
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * The names of the copyright holders or contributors may not be used to
+   endorse or promote products derived from this software without specific
+   prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
 body
 {
-	font: 10pt 'Helvetica';
-	color: white;
-	margin: 0;
+    font: 10pt 'Helvetica';
+    color: white;
+    margin: 0;
+}
+
+.ctrl
+{
+    -apple-dashboard-region: dashboard-region(control rectangle);
 }
 
 #front
 {
-	display: block;
-	margin: 0;
-	padding: 19px 0 0 24px;
-	width: 248px;
-	height: 144px;
+    display: block;
+    margin: 0;
+    padding: 19px 0 0 24px;
+    width: 248px;
+    height: 144px;
 }
 
 #bgLeft,
 #bgCenter,
 #bgRight
 {
-	position: absolute;
-	top: 0;
-	z-index: -1;
+    position: absolute;
+    top: 0;
+    z-index: -1;
 }
 
 #bgLeft
 {
-	left: 0;
+    left: 0;
 }
 
 #bgCenter
 {
-	left: 130px;
-	width: 123px;
-	height: 163px;
+    left: 130px;
+    width: 123px;
+    height: 163px;
 }
 
 #bgRight
 {
-	left: 253px;
+    left: 253px;
 }
 
 #back
 {
-	display: none;
-	background: url('BackgroundBack.png') no-repeat top;
-	font-size: 8pt;
-	font-weight: bold;
-	margin: 0;
-	padding: 14px 24px 0 24px;
-	width: 224px;
-	height: 149px;
+    display: none;
+    background: url('BackgroundBack.png') no-repeat top;
+    font-size: 8pt;
+    font-weight: bold;
+    margin: 0;
+    padding: 14px 24px 0 24px;
+    width: 224px;
+    height: 149px;
 }
 
 #tableWrapper
 {
-	display: table;
-	width: 117px;
+    display: table;
+    width: 117px;
 }
 
 #mainTable
 {
-	margin-left: auto;
-	margin-right: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #mainTable th
 {
-	padding-right: 0.25em;
+    padding-right: 0.25em;
 }
 
 th
 {
-	text-align: right;
-	white-space: nowrap;
+    text-align: right;
+    white-space: nowrap;
 }
 
 #manualEntry
 {
-	display: none;
+    display: none;
 }
 
 canvas
 {
-	float: left;
-	margin-right: 0.75em;
+    float: left;
+    margin-right: 0.75em;
 }
 
 #infoButton
 {
-	position: absolute;
-	right: 26px;
-	bottom: 31px;
+    position: absolute;
+    right: 26px;
+    bottom: 31px;
 }
 
 #doneButton
 {
-	position: absolute;
-	right: 19px;
-	bottom: 24px;
+    position: absolute;
+    right: 19px;
+    bottom: 24px;
+}
+
+#mapIcon
+{
+    position: relative;
+    bottom: -2px;
 }
 
 #about
 {
-	position: absolute;
-	left: 24px;
-	bottom: 27px;
+    position: absolute;
+    left: 24px;
+    bottom: 27px;
 }
 
 .link
 {
-	text-decoration: underline;
-	cursor: pointer;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 a, a:hover, a:active, a:visited
 {
-	color: white;
+    color: white;
+}
+
+#twilightIcon
+{
+    display: none;
+    position: absolute;
+    left: 14px;
+    bottom: 16px;
+    z-index: -1;
 }
 
 #placeName
 {
-	position: absolute;
-	left: 24px;
-	bottom: 23px;
-	clear: both;
-	text-align: center;
-	width: 224px;
-	text-transform: uppercase;
-	font-weight: bold;
-	font-size: 9pt;
-	opacity: 0.6667;
-	margin-top: 10px;
+    position: absolute;
+    left: 24px;
+    bottom: 23px;
+    clear: both;
+    text-align: center;
+    width: 224px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 9pt;
+    opacity: 0.6667;
+    margin-top: 10px;
 }
 
 #bandAid
 {
-	position: absolute;
-	top: 66px;
-	left: 126px;
-	display: none;
+    position: absolute;
+    top: 66px;
+    left: 126px;
+    display: none;
 }
 
 #settingsTable
 {
-	border-spacing: 0;
+    border-spacing: 0;
 }
 
 #cityRow th,
 #cityRow td
 {
-	padding-bottom: 2px;
+    padding-bottom: 2px;
 }
 
 #twilightRow th,
 #twilightRow td
 {
-	border-top: 1px solid rgba(255, 255, 255, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
 }

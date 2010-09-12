@@ -1,0 +1,266 @@
+#!/usr/bin/perl
+
+# compact_make_db version 1.0.3
+# Makes the compact, compressed database used for Sol lookups.
+# Copyright (C) 2010 Kyle J. McKay.  All rights reserved.
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+use 5.6.1;
+use strict;
+use warnings;
+use bytes;
+
+use Cwd qw(:DEFAULT realpath);
+use File::Basename;
+use DBI;
+#use DBD::SQLite 1.20;  # We require at least 1.20 to avoid seg faults!
+use DBD::SQLite; # 1.14 is included with Mac OS X 10.5.x and 10.6.x
+use File::Temp qw(tempfile);
+
+our $VERSION;
+our ($fullme, $me, $medir, $tempdb, $dbh, $database, $toc_offset);
+our (@regions, @timezones, @offsets, @sizes, %keys);
+
+BEGIN {
+  $VERSION = '1.0.0';
+}
+
+INIT {
+  $fullme = realpath($0);
+  $me = basename($0);
+  $medir = dirname($fullme);
+}
+
+END {
+  $dbh->disconnect() if $dbh;
+  unlink $tempdb if $tempdb;
+  unlink $database if $database;
+}
+
+sub main;
+exit main;
+
+sub initial_toc($)
+{
+  my $dbh = shift;
+  @regions = ();
+  @timezones = ();
+  @offsets = ();
+  %keys = ();
+  my $i = 0;
+  
+  my $sth = $dbh->prepare(q{
+    SELECT DISTINCT region COLLATE NOCASE, time_zone COLLATE NOCASE
+    FROM sol_places
+    WHERE region IS NOT NULL AND region != ''
+      AND time_zone IS NOT NULL AND time_zone != ''
+    ORDER BY upper(region), upper(time_zone)
+  });
+  die "Cannot prepare statement\n" if !$sth;
+  $sth->execute() or die "Cannot execute select\n";
+  while (my $ar = $sth->fetch()) {
+    push(@regions, $$ar[0]);
+    push(@timezones, $$ar[1]);
+    push(@offsets, 0);
+    push(@sizes, 0);
+    $keys{lc($$ar[0]).'|'.lc($$ar[1])} = $i++;
+  }
+}
+
+sub compute_offsets()
+{
+  my $offset = 0;
+  for (my $i=0; $i < @regions; ++$i) {
+    $offsets[$i] = $offset;
+    $offset += $sizes[$i];
+  }
+  return $offset;
+}
+
+sub write_toc($)
+{
+  my $fh = shift;
+  $toc_offset = tell($fh);
+  for (my $i=0; $i < @regions; ++$i) {
+    print $fh pack('Ca*', length($regions[$i]), $regions[$i]),
+      pack('Ca*', length($timezones[$i]), $timezones[$i]),
+      pack('N', $offsets[$i]);
+  }
+  print $fh pack('C', 0);
+}
+
+sub update_toc($)
+{
+  my $fh = shift;
+  seek($fh, $toc_offset, 0) or die "Cannot seek to beginning of database file\n";
+  write_toc($fh);
+}
+
+sub write_data($$)
+{
+  my ($dbh, $fh) = @_;
+  my ($lastlat, $lastlon, $lastkey, $key, $lastll, $ll, $breakout);
+  my $i = -1;
+  # %llnames has lc(name) keys and original as value
+  # %llaltnames has lc(name) keys and hashref of lc(altname)s as values
+  my (%llnames, %llaltnames, $namecnt, $altcnt, $llcnt);
+  my ($totalrt, $totalnm, $totalalt, $totalll) = (0,0,0,0);
+  my $sth = $dbh->prepare(q{
+    SELECT region, time_zone, latitude, longitude, name, uc_alt_name
+    FROM sol_places
+    WHERE ( latitude != 0.0 OR longitude != 0.0 )
+      AND name IS NOT NULL AND name != ''
+      AND region IS NOT NULL AND region != ''
+      AND time_zone IS NOT NULL AND time_zone != ''
+    ORDER BY upper(region), upper(time_zone), latitude, longitude,
+      upper(name), upper(uc_alt_name)
+  });
+  die "Cannot prepare statement\n" if !$sth;
+  $sth->execute() or die "Cannot execute select\n";
+  $lastkey = '|';
+  $lastll = '|';
+  
+  my $prow = sub ($) {
+    my $ar = shift;
+    $key = lc($$ar[0]).'|'.lc($$ar[1]);
+    $ll = $$ar[2].'|'.$$ar[3];
+    $breakout = 1 if $key ne $lastkey;
+    if (($ll ne $lastll || $breakout)
+        && $lastll && $lastll ne '|' && keys(%llnames)) {
+      # anything left to do to finish up the previous ll goes here
+      my $dump = '';
+      foreach my $name (sort({lc($a).$a cmp lc($b).$b} keys(%llnames))) {
+        my $rname = $llnames{$name};
+        $dump .= pack('Ca*', length($rname), $rname);
+        my $arn = $llaltnames{$name};
+        foreach my $aname (sort({lc($a).$a cmp lc($b).$b} keys(%$arn))) {
+          my $raname = $$arn{$aname};
+          $dump .= pack('Ca*', (128|length($raname)), $raname)
+            unless exists($llnames{lc($raname)});
+        }
+      }
+      $dump .= pack('C', 0);
+      my $lat = $lastlat + 0.0;
+      my $lon = $lastlon + 0.0;
+      $dump .= pack('N', unpack('l', pack('f', $lat)));
+      $dump .= pack('N', unpack('l', pack('f', $lon)));
+      print $fh $dump;
+      $sizes[$i] += length($dump);
+    }
+    if ($key ne $lastkey) {
+      if ($lastkey && $lastkey ne '|') {
+        # anything left to do to finish up the previous region goes here
+        print $fh pack('C', 0);
+        $sizes[$i] += 1;
+        print STDERR "    NAMECNT=$namecnt  LLCNT=$llcnt  ALTCNT=$altcnt\n";
+        ++$totalrt;
+        $totalnm += $namecnt;
+        $totalalt += $altcnt;
+        $totalll += $llcnt;
+      }
+      if ($key ne '|') {
+        print STDERR "Region: $$ar[0] TimeZone: $$ar[1]\n";
+        ++$i;
+        $keys{$key} == $i
+          or die "DATA select results out of sync with TOC!\n";
+      }
+      $lastkey = $key;
+      $llcnt = 0;
+      $namecnt = 0;
+      $altcnt = 0;
+    }
+    if ($ll ne $lastll || $breakout) {
+      $lastll = $ll;
+      $lastlat = $$ar[2];
+      $lastlon = $$ar[3];
+      ++$llcnt;
+      %llnames = ();
+      %llaltnames = ();
+      $breakout = 0;
+    }
+    if (!$llnames{lc($$ar[4])}) {
+      $llnames{lc($$ar[4])} = $$ar[4];
+      ++$namecnt;
+      $llaltnames{lc($$ar[4])} = {};
+    }
+    my $althash = $llaltnames{lc($$ar[4])};
+    if ($$ar[5] && !$$althash{lc($$ar[5])}) {
+      $$althash{lc($$ar[5])} = $$ar[5];
+      ++$altcnt;
+    }
+  };
+
+  while (my $ar = $sth->fetch()) {
+    &$prow($ar);
+  }
+  &$prow(['','','','','','']);
+  print STDERR "TOTALS: ",
+    "REG+TZ=$totalrt  NAME=$totalnm  LATLON=$totalll  ALTNAME=$totalalt\n";
+}
+
+sub main
+{
+  local *_ = *ARGV;
+  my $helper = "$medir/database_make_sql";
+  my $sqlite3 = `which sqlite3`; chomp($sqlite3);
+  my $gzip = `which gzip`; chomp($gzip);
+  #my $bzip2 = `which bzip2`; chomp($bzip2);
+  die "Can't find helper: $helper\n" unless -x $helper;
+  die "Can't find sqlite3\n" unless -x $sqlite3;
+  die "Can't find gzip\n" unless -x $gzip;
+  #die "Can't find bzip2\n" unless -x $bzip2;
+  my $tempfh;
+  ($tempfh, $tempdb) =
+    tempfile("sol-temp-XXXXXX", DIR => '/tmp', SUFFIX => '.sq3');
+  close($tempfh);
+  print STDERR "Creating temporary database, please stand by...\n";
+  my $cmd = "'$helper' | '$sqlite3' '$tempdb'";
+  print STDERR "$cmd\n";
+  system($cmd) and die "Temporary database creation failed!\n";
+  print STDERR "...temporary database created.\n";
+  
+  my $dbh = DBI->connect("dbi:SQLite:$tempdb",'','',{})
+    or die "Cannot access SQLite3 database via DBI DBD::SQLite!\n";
+  my ($vers) = $dbh->selectrow_array('SELECT sqlite_version()')
+    or die "Cannot get SQLite version\n";
+  
+  $database = 'database';
+  my $datah;
+  open($datah, '>', $database)
+    or die "Cannot open database file for writing\n";
+  unlink("$database.gz");
+  print $datah pack('CCCC', 0x53, 0x4F, 0x4C, 0x21);
+  
+  print STDERR "Generating TOC...\n";
+  initial_toc($dbh);
+  print STDERR "Writing place-holder TOC...\n";
+  write_toc($datah);
+  print STDERR "Generating DATA...\n";
+  write_data($dbh, $datah);
+  print STDERR "Writing final TOC...\n";
+  compute_offsets();
+  update_toc($datah);
+  print STDERR "Compact database generation completed.\n";
+  
+  close($datah);
+
+  $cmd = "'$gzip' -9 '$database'";
+  #$cmd = "'$bzip2' -9 '$database'";
+  print STDERR "$cmd\n";
+  system($cmd) and die "Unable to gzip -9 the database\n";
+  #system($cmd) and die "Unable to bzip2 -9 the database\n";
+  
+  return 0;
+}

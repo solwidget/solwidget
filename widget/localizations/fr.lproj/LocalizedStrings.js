@@ -20,4 +20,5 @@ localizedStrings['Nautical']     = 'Nautique';
 localizedStrings['Astronomical'] = 'Astronomique';
 
 localizedStrings['by']           = 'par';
+localizedStrings['About']        = 'À propos de';
 localizedStrings['Done']         = 'Terminé';

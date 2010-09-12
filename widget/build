@@ -1,11 +1,66 @@
 #!/bin/sh
 
+# Sol Widget build script
+# Copyright (C) 2006 Daniel S. Neumeyer
+# Portions Copyright (C) 2010 Kyle J. McKay
+# All rights reserved
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#  * The names of the copyright holders or contributors may not be used to
+#    endorse or promote products derived from this software without specific
+#    prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+set -e
+if [ -e Sol.wdgt ]; then
+  echo "Sol.wdgt already exists, remove it first"
+  exit 1
+fi
+xcodebuild -project TimeZoneHelper/TimeZoneHelper.xcodeproj -configuration Release
+if [ ../service/database_values.txt -nt ../service/database.gz ]; then
+  (cd ../service; ./compact_make_db)
+fi
 mkdir Sol.wdgt
-cp Sol.html       \
-   Sol.css        \
-   Sol.js         \
-   Images/*.png   \
-   Info.plist     \
-   Sol.wdgt/
+cp \
+  Sol.html         \
+  Sol.css          \
+  Sol.js           \
+  About.html       \
+  snowscreenF12.png \
+  delete_keep_background.png \
+  widget.png       \
+  ../LICENSE.txt   \
+  ../COPYING.txt   \
+  ../OLDLICENSE.txt \
+  ../CHANGELOG.txt \
+  Images/*.png     \
+  Info.plist       \
+  Sol.wdgt/
 cp -r localizations/*.lproj Sol.wdgt/
 cp -r TimeZoneHelper/build/Release/TimeZoneHelper.bundle Sol.wdgt/
+strip -S -x -u Sol.wdgt/TimeZoneHelper.bundle/Contents/MacOS/TimeZoneHelper
+find Sol.wdgt -name '.*' -print0 | xargs -0 rm -rf
+find Sol.wdgt -type f -print0 | xargs -0I% sh -c "f='%';"' cat "$f" > "$f.tmp"; if [ -x "$f" ]; then chmod a+x "$f.tmp"; fi; mv -f "$f.tmp" "$f"'
+cat ../service/database.gz > Sol.wdgt/TimeZoneHelper.bundle/Contents/Resources/database.gz
+stamp="`TZ=Z date +%Y%m%d`0000"
+find Sol.wdgt -print0 | TZ=Z xargs -0 touch -t "$stamp"
+rm -f Sol.wdgt.zip
+zip -X -9 -r Sol.wdgt.zip Sol.wdgt
+TZ=Z touch -t "$stamp" Sol.wdgt.zip

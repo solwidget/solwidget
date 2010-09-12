@@ -20,4 +20,5 @@ localizedStrings['Nautical']     = 'Nautisk';
 localizedStrings['Astronomical'] = 'Astronomisk';
 
 localizedStrings['by']           = 'av';
+localizedStrings['About']        = 'Om';
 localizedStrings['Done']         = 'Klar';

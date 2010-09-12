@@ -1,0 +1,29 @@
+All source files are clearly marked at the top as to the license
+that applies to them.
+
+The original Sol version 1.2.3 sources are licensed under a BSD
+3-clause style license.  Many files in the Sol project continue to
+use this license INCLUDING the raw database dump (i.e. the
+database_values.txt and database_make_sql files) and ALL the image
+files (including the .psd files).
+
+The original Sol version 1.2.3 source release license can be found
+in the file OLDLICENSE.txt.
+
+When Dan released the Sol version 1.2.3 source code, he referred
+to the license as an MIT license and in fact the original README
+file included with the Sol version 1.2.3 source code release says
+the code is licensed under the MIT license which can be found in
+the LICENSE file (included here as the OLDLICENSE.txt file).  However,
+the license text from that file actually matches the text of the
+modified BSD (aka 3-clause BSD) license, not the MIT license.  See
+http://www.gnu.org/licenses/license-list.html#ModifiedBSD for
+comparison.
+
+The new source code files that were added to create, read and write
+the special compact-format database now included in the Sol widget
+are licensed under the GPLv3.  Since these code files are built
+into the TimeZoneHelper and that is an essential part of the Sol.wdgt
+combined work, the resulting Sol.wdgt falls under the GPLv3 license.
+
+The GPLv3 license can be found in the file COPYING.txt.

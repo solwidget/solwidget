@@ -1,4 +1,4 @@
-//
+﻿//
 //  LocalizedStrings.js (nl)
 //  Translation by Joram Hoekman
 //
@@ -20,6 +20,7 @@ localizedStrings['Nautical']     = 'Nautisch';
 localizedStrings['Astronomical'] = 'Astronomisch';
 
 localizedStrings['by']           = 'door';
+localizedStrings['About']        = 'Over de';
 localizedStrings['Done']         = 'Klaar';
 
 

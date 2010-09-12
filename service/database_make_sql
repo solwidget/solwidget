@@ -1,0 +1,126 @@
+#!/bin/sh
+
+# Sol Widget database_make_sql script
+# Produces SQLite compatible SQL to reconstruct the Sol places database
+# Copyright (C) 2010 Kyle J. McKay.  All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#  * The names of the copyright holders or contributors may not be used to
+#    endorse or promote products derived from this software without specific
+#    prior written permission.
+#  
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+me="$0"
+if [ -L "$me" ]; then
+  me="$(readlink "$me")"
+  medir="$(cd "`dirname "$0"`" && cd "`dirname "$me"`" && pwd -P)"
+else
+  medir="$(cd "`dirname "$0"`" && pwd -P)"
+fi
+mereal="$(basename "$me")"
+me="$(basename "$0")"
+dbfile="$medir/database_values"
+for dbcheck in "$dbfile.001.txt" "$dbfile.002.txt" "$dbfile.003.txt" "$dbfile.004.txt"; do
+  if [ ! -r "$dbcheck" ]; then
+    echo "Cannot find readable '$dbcheck' file" >&2
+    exit 1
+  fi
+done
+cat << PREFIX
+PRAGMA synchronous = OFF;
+BEGIN EXCLUSIVE TRANSACTION;
+-- Server version 4.1.16-standard-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table "sol_places"
+--
+
+DROP TABLE IF EXISTS "sol_places";
+CREATE TABLE "sol_places" (
+  "name" varchar(255) default NULL,
+  "uc_name" varchar(255) default NULL,
+  "uc_alt_name" varchar(255) default NULL,
+  "region" varchar(32) default NULL,
+  "latitude" double default NULL,
+  "longitude" double default NULL,
+  "time_zone" varchar(255) default NULL/*,*/
+  /* KEY "sol_places_uc_name" ("uc_name") *//*,*/
+  /* KEY "sol_places_uc_alt_name" ("uc_alt_name") *//*,*/
+  /* KEY "sol_places_region" ("region") */
+) /* ENGINE=MyISAM DEFAULT CHARSET=utf8 */;
+
+--
+-- Dumping data for table "sol_places"
+--
+
+/*!40000 ALTER TABLE "sol_places" DISABLE KEYS */;
+-- LOCK TABLES "sol_places" WRITE;
+
+PREFIX
+linepre='INSERT INTO "sol_places" VALUES ('
+linesuf=');'
+{
+	sed -e "1d" < "$dbfile.001.txt"
+	sed -e "1d" < "$dbfile.002.txt"
+	sed -e "1d" < "$dbfile.003.txt"
+	sed -e "1d" < "$dbfile.004.txt"
+} | \
+{
+  if read -r line; then
+    while read -r line; do
+      case "$line" in
+        '#'*|'') :;;
+        *) echo "$linepre$line$linesuf"
+      esac
+    done
+  fi
+}
+cat << SUFFIX
+
+-- UNLOCK TABLES;
+
+CREATE INDEX 'sol_places.sol_places_uc_name' ON 'sol_places' ("uc_name");
+CREATE INDEX 'sol_places.sol_places_uc_alt_name' ON 'sol_places' ("uc_alt_name");
+CREATE INDEX 'sol_places.sol_places_region' ON 'sol_places' ("region");
+
+/*!40000 ALTER TABLE "sol_places" ENABLE KEYS */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+END TRANSACTION;
+SUFFIX

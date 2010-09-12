@@ -1,0 +1,31 @@
+# -unexported_symbols_list
+# Copyright (C) 2010 Kyle J. McKay.  All rights reserved.
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+_soldb_close
+_soldb_dopen
+_soldb_findregion
+_soldb_freeregion
+_soldb_freeresults
+_soldb_getname
+_soldb_getverbose
+_soldb_maxllsize
+_soldb_open
+_soldb_readregion
+_soldb_searchregion
+_soldb_setname
+_soldb_setverbose
+_soldb_toccount
+_soldb_tocentry
