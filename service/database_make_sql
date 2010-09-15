@@ -107,9 +107,12 @@ cat << SUFFIX
 
 -- UNLOCK TABLES;
 
+CREATE INDEX 'sol_places.sol_places_name' ON 'sol_places' ("name");
 CREATE INDEX 'sol_places.sol_places_uc_name' ON 'sol_places' ("uc_name");
 CREATE INDEX 'sol_places.sol_places_uc_alt_name' ON 'sol_places' ("uc_alt_name");
 CREATE INDEX 'sol_places.sol_places_region' ON 'sol_places' ("region");
+CREATE INDEX 'sol_places.sol_places_latitude_longitude' ON 'sol_places' ("latitude","longitude");
+CREATE INDEX 'sol_places.sol_places_time_zone' ON 'sol_places' ("time_zone");
 
 /*!40000 ALTER TABLE "sol_places" ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
