@@ -37,8 +37,20 @@
 var gVersion = '1.3.2';
 
 
-// Location and GMT offset of selected location.
+// Last lookup (not validated)
 
+var gLookupName;
+var gLookupStateName;
+var gLookupCountryName;
+var gLookupCountryCode;
+
+
+// Last valid lookup, Location and GMT offset of selected location.
+
+var gPlaceName;
+var gStateName;
+var gCountryName;
+var gCountryCode;
 var gLatitude;
 var gLongitude;
 var gTimeOffset;
@@ -827,6 +839,9 @@ function WidgetWillRemove()
     widget.setPreferenceForKey(null, widget.identifier + '-latitude');
     widget.setPreferenceForKey(null, widget.identifier + '-longitude');
     widget.setPreferenceForKey(null, widget.identifier + '-name');
+    widget.setPreferenceForKey(null, widget.identifier + '-state');
+    widget.setPreferenceForKey(null, widget.identifier + '-country');
+    widget.setPreferenceForKey(null, widget.identifier + '-countryCode');
     widget.setPreferenceForKey(null, widget.identifier + '-selectedName');
     widget.setPreferenceForKey(null, widget.identifier + '-selectedRegion');
     widget.setPreferenceForKey(null, widget.identifier + '-selectedState');
@@ -846,7 +861,7 @@ function CityRequestHandler()
     results = gCityRequest.responseXML.getElementsByTagName('r');
     if (results.length == 0) return;
     
-    name       = results[0].getElementsByTagName('n')[0].firstChild.nodeValue;
+    gPlaceName = results[0].getElementsByTagName('n')[0].firstChild.nodeValue;
     gLatitude  = results[0].getElementsByTagName('a')[0].firstChild.nodeValue;
     gLongitude = results[0].getElementsByTagName('o')[0].firstChild.nodeValue;
     timeZone   = results[0].getElementsByTagName('t')[0].firstChild.nodeValue;
@@ -854,15 +869,22 @@ function CityRequestHandler()
     window.TimeZoneHelper.setTimeZoneWithName(timeZone);
     gTimeOffset = window.TimeZoneHelper.timeOffsetHours();
     
-    widget.setPreferenceForKey(name,       widget.identifier + '-name');
-    widget.setPreferenceForKey(name,       widget.identifier + '-selectedName');
-    widget.setPreferenceForKey(gLatitude,  widget.identifier + '-latitude');
-    widget.setPreferenceForKey(gLongitude, widget.identifier + '-longitude');
-    widget.setPreferenceForKey(timeZone,   widget.identifier + '-timeZone');
+    gStateName   = gLookupStateName;
+    gCountryName = gLookupCountryName;
+    gCountryCode = gLookupCountryCode;
+
+    widget.setPreferenceForKey(gPlaceName,   widget.identifier + '-name');
+    widget.setPreferenceForKey(gPlaceName,   widget.identifier + '-selectedName');
+    widget.setPreferenceForKey(gStateName,   widget.identifier + '-state');
+    widget.setPreferenceForKey(gCountryName, widget.identifier + '-country');
+    widget.setPreferenceForKey(gCountryCode, widget.identifier + '-countryCode');
+    widget.setPreferenceForKey(gLatitude,    widget.identifier + '-latitude');
+    widget.setPreferenceForKey(gLongitude,   widget.identifier + '-longitude');
+    widget.setPreferenceForKey(timeZone,     widget.identifier + '-timeZone');
     
-    document.getElementById('city').value = name;
+    document.getElementById('city').value = gPlaceName;
+    SetText('placeName', gPlaceName);
     
-    SetText('placeName', name);
     Redraw();
 }
 
@@ -921,6 +943,53 @@ function FlipToBack()
 }
 
 
+// -- PerformLookupWith
+//
+// Make the actual lookup request and remember the lookup values
+//
+function PerformLookupWith(name, state, countryName, countryCode, executeNow)
+{
+    gLookupName        = name;
+    gLookupStateName   = state;
+    gLookupCountryName = countryName;
+    gLookupCountryCode = countryCode;
+    
+    var regionCode = countryCode;
+    if (countryCode == 'US') regionCode += '/' + state;
+
+    // Start location lookup.
+/*
+    re = /\//;
+    urlRegion = regionCode.replace(re, '%2f');
+
+    url = 'http://captaindan.org/services/solplaces/?v=' + gVersion + '&r=' + urlRegion + '&n=' + name;
+
+    if (gCityRequest) gCityRequest.abort();
+    gCityRequest = new XMLHttpRequest();
+    gCityRequest.onreadystatechange = CityRequestHandler;
+    gCityRequest.open('GET', url, true);
+    gCityRequest.send('');
+*/
+    var response = window.TimeZoneHelper.lookupPlaceInRegionWithName(regionCode, name);
+    gCityRequest = {};
+    gCityRequest.readyState = 4;
+    gCityRequest.status = 200;
+    gCityRequest.responseXML = (new DOMParser()).parseFromString(response, 'text/xml');
+    if (gCityRequest.responseXML)
+    {
+        if (executeNow)
+        {
+            CityRequestHandler();
+            SaveSettings();
+        }
+        else
+        {
+            setTimeout("CityRequestHandler(); SaveSettings();", 0);
+        }
+    }
+}
+
+
 // -- PerformLookup --
 //
 // Perform a city lookup now and save the settings
@@ -929,15 +998,13 @@ function PerformLookup(executeNow)
 {
     // Save preferences.
     
-    region = document.getElementById('country').options[document.getElementById('country').selectedIndex].value;
-    widget.setPreferenceForKey(region, widget.identifier + '-selectedRegion');
+    var countryMenu = document.getElementById('country');
+    country = countryMenu.options[countryMenu.selectedIndex].value;
+    widget.setPreferenceForKey(country, widget.identifier + '-selectedRegion');
     
-    if (region == 'US')
+    if (country == 'US')
     {
-        //region += '%2f';
-        region += '/';
         state = document.getElementById('state').options[document.getElementById('state').selectedIndex].value
-        region += state;
         widget.setPreferenceForKey(state, widget.identifier + '-selectedState');
     }
     
@@ -948,37 +1015,13 @@ function PerformLookup(executeNow)
     widget.setPreferenceForKey(twilightZenith, widget.identifier + '-twilightZenith');
     
     
-    // Start location lookup.
-/*
-    url = 'http://captaindan.org/services/solplaces/?v=' + gVersion + '&r=' + region + '&n=' + name;
-
-    if (gCityRequest) gCityRequest.abort();
-    gCityRequest = new XMLHttpRequest();
-    gCityRequest.onreadystatechange = CityRequestHandler;
-    gCityRequest.open('GET', url, true);
-    gCityRequest.send('');
-*/
     if (gSavedSettings.country != document.getElementById('country').value
         || gSavedSettings.state != document.getElementById('state').value
         || gSavedSettings.city != document.getElementById('city').value)
     {
-        var response = window.TimeZoneHelper.lookupPlaceInRegionWithName(region, name);
-        gCityRequest = {};
-        gCityRequest.readyState = 4;
-        gCityRequest.status = 200;
-        gCityRequest.responseXML = (new DOMParser()).parseFromString(response, 'text/xml');
-        if (gCityRequest.responseXML)
-        {
-            if (executeNow)
-            {
-                CityRequestHandler();
-                SaveSettings();
-            }
-            else
-            {
-                setTimeout("CityRequestHandler(); SaveSettings();", 0);
-            }
-        }
+        countryName = countryMenu.options[countryMenu.selectedIndex].text;
+        state = document.getElementById('state').value;
+        PerformLookupWith(name, state, countryName, country, executeNow);
     }
 }
 
@@ -1138,62 +1181,65 @@ function WidgetDidLoad()
     
     // Get location and time zone from preferences, or set to default.
     
-    var name = widget.preferenceForKey(widget.identifier + '-name');
+    gPlaceName = widget.preferenceForKey(widget.identifier + '-name');
     var myCity = null;
     var myRegion = null;
     var myState = null;
     
-    if (name)
+    if (gPlaceName)
     {
-        gLatitude  = widget.preferenceForKey(widget.identifier + '-latitude');
-        gLongitude = widget.preferenceForKey(widget.identifier + '-longitude');
+        gLatitude    = widget.preferenceForKey(widget.identifier + '-latitude');
+        gLongitude   = widget.preferenceForKey(widget.identifier + '-longitude');
+        gStateName   = widget.preferenceForKey(widget.identifier + '-state');
+        gCountryName = widget.preferenceForKey(widget.identifier + '-country');
+        gCountryCode = widget.preferenceForKey(widget.identifier + '-countryCode');
         window.TimeZoneHelper.setTimeZoneWithName(widget.preferenceForKey(widget.identifier + '-timeZone'));
+
+        // Use alternate values for older versions
+
+        if (!gStateName)
+            gStateName   = widget.preferenceForKey(widget.identifier + '-selectedState');
+        if (!gCountryCode)
+            gCountryCode = widget.preferenceForKey(widget.identifier + '-selectedRegion');
+        if (!gCountryName && gCountryCode)
+        {
+            var countryMenu = document.getElementById('country');
+            countryMenu.value = gCountryCode;
+            gCountryName = countryMenu.options[countryMenu.selectedIndex].text;
+        }
     }
     else
     {
-        name       = 'Cupertino';
-        gLatitude  =   37.32306;
-        gLongitude = -122.03111;
+        gPlaceName   = 'Cupertino';
+        gLatitude    =   37.32306;
+        gLongitude   = -122.03111;
+        gStateName   = 'CA';
+        gCountryName = 'United States';
+        gCountryCode = 'US';
         window.TimeZoneHelper.setTimeZoneWithName('US/Pacific');
-            
+        
         myCity   = window.TimeZoneHelper.myCityName();
         myRegion = window.TimeZoneHelper.myRegionCode();
     }
     
-    SetText('placeName', name);
+    SetText('placeName', gPlaceName);
     gTimeOffset = window.TimeZoneHelper.timeOffsetHours();
     
     if (myCity && myRegion)
     {
-/*
-        re = /\//;
-        urlRegion = myRegion.replace(re, '%2f');
-        
-        url = 'http://captaindan.org/services/solplaces/?v=' + gVersion + '&r=' + urlRegion + '&n=' + myCity;
-
-        if (gCityRequest) gCityRequest.abort();
-        gCityRequest = new XMLHttpRequest();
-        gCityRequest.onreadystatechange = CityRequestHandler;
-        gCityRequest.open('GET', url, true);
-        gCityRequest.send('');
-*/
-        var response = window.TimeZoneHelper.lookupPlaceInRegionWithName(myRegion, myCity);
-        gCityRequest = {};
-        gCityRequest.readyState = 4;
-        gCityRequest.status = 200;
-        gCityRequest.responseXML = (new DOMParser()).parseFromString(response, 'text/xml');
-        if (gCityRequest.responseXML) setTimeout("CityRequestHandler();", 0);
-
         if (myRegion.slice(0, 2) == 'US')
         {
             myState = myRegion.slice(3);
             myRegion = 'US';
         }
         
-        document.getElementById('country').value = myRegion;
+        var countryMenu = document.getElementById('country');
+        countryMenu.value = myRegion;
         CountryDidChange();
         if (myState) document.getElementById('state').value = myState;
         document.getElementById('city').value = myCity;
+        regionName = countryMenu.options[countryMenu.selectedIndex].text;
+        PerformLookupWith(myCity, myState, regionName, myRegion);
     }
     
     
@@ -1245,30 +1291,15 @@ function aboutURL()
 //
 function getLocationName()
 {
-    var countryMenu = document.getElementById('country');
-    var countryIndex;
-    var city, state;
-
-    if (isBackSide())
+    if (!gCountryCode || !gCountryName || !gPlaceName) return null;
+    if (gCountryCode == 'US' && !gStateName) return null;
+    if (gCountryCode == 'US')
     {
-        countryIndex = gSavedSettings.countryIndex;
-        city = gSavedSettings.city;
-        state = gSavedSettings.state;
+        return gPlaceName + ', ' + gStateName;
     }
     else
     {
-        countryIndex = countryMenu.selectedIndex;
-        city = document.getElementById('city').value;
-        state = document.getElementById('state').value;
-    }
-
-    if (countryMenu.options[countryIndex].value == 'US')
-    {
-        return city + ', ' + state;
-    }
-    else
-    {
-        return city + ', ' + countryMenu.options[countryIndex].text;
+        return gPlaceName + ', ' + gCountryName;
     }
 }
 
@@ -1295,9 +1326,11 @@ function encodeMapQuery(text)
 //
 function mapURL()
 {
+    var locName = getLocationName();
+    if (!locName) return null;
     return 'http://maps.google.com/maps?q='
         + gLatitude + ',' + gLongitude
-        + '+(' + encodeMapQuery(getLocationName()) + ')'
+        + '+(' + encodeMapQuery(locName) + ')'
         + '&mrt=ds&z=13';
 }
 
