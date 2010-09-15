@@ -34,10 +34,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <title>About Sol</title>
 <style type="text/css">
 body {
+  color: black;
+  background-color: white;
   margin: 1em 0;
   min-width: 1024px;
   font-family: Times, Times New Roman, serif;
   font-size: 12pt;
+}
+a:link {
+  color: blue;
+}
+a:visited {
+  color: navy;
+}
+a:active {
+  color: red;
 }
 * {
   word-wrap: break-word;
@@ -50,7 +61,6 @@ pre {
   position: relative;
   width: 640px;
   margin: 0 auto 0 auto;
-  /*border: thin solid red;*/
   text-align: justify;
 }
 #screenshot {
@@ -96,13 +106,14 @@ pre {
   display: inline-block;
   font-size: 60%;
 }
-b,h1,h2,h3,h4,h5,h6,.summary,#appleRequiredText,#copyright {
+h1,h2,h3,h4,h5,h6,.summary,#appleRequiredText,#copyright {
   font-family: Helvetica, Arial, sans-serif;
+  font-weight: normal;
 }
 h1,h2,h3,h4,h5,h6 {
   border-bottom: thin solid gray;
 }
-h1 {
+div#content > h1 {
   /* Part of workaround for Opera bug */
   margin-top: 0;
 
@@ -119,16 +130,19 @@ h1 {
   display: float;
   position: absolute;
   left: -192px;
-  text-align: left;
+  text-align: right;
   width: 160px;
-  background-color: #eef;
-  border: thin solid gray;
   font-size: 75%;
   margin: 0;
   padding: 2px;
-  border-radius: 4px;
-  /* for firefox */
-  -moz-border-radius: 4px;
+}
+.sidebar a:visited, .sidebar a:link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: thin dotted gray;
+}
+.sidebar a:active {
+  color: red;
 }
 .license {
   display: block;
@@ -138,6 +152,12 @@ h1 {
   margin: 10px 20px 10px 20px;
   background-color: #eee;
 }
+.license a:link, .license a:visited {
+  color: inherit;
+}
+.license a:active {
+  color: red;
+}
 .summary {
   display: block;
   margin-bottom: 0.79em;
@@ -145,9 +165,18 @@ h1 {
   color: gray;
   text-transform: uppercase;
 }
+.super, .fakesuper > span > span {
+  font-size: 75%;
+}
 .super {
   vertical-align: super;
-  font-size: 75%;
+}
+.fakesuper {
+  position: absolute;
+}
+.fakesuper > span {
+  position: relative;
+  top: -0.4em;
 }
 a img {
   /* For firefox */
@@ -170,8 +199,13 @@ function HideDK()
 <body onload="Loaded()">
 <div id="content">
 
+<h1 id="About">Sol 1.3.2</h1>
+<span class="summary">Sunrise and Sunset Dashboard Widget</span>
+
+<p>
+
 <span id="TOC" class="sidebar">
-<b>Table of Contents</b><br /><span>
+<i>Table of Contents</i><br /><span>
 <a href="#About"       >About</a><br />
 <a href="#Download"    >Download</a><br />
 <a href="#History"     >History</a><br />
@@ -182,9 +216,8 @@ function HideDK()
 <a href="#License"     >License</a><br />
 </span></span>
 
-<h1 id="About">Sol 1.3.1</h1>
-<span class="summary">Sunrise and Sunset Dashboard Widget</span>
-<p>Sol is a Dashboard widget that tells you what time sunrise and sunset are, as well as dawn and dusk.</p>
+Sol is a Dashboard widget that tells you what time sunrise and sunset are, as well as dawn and dusk.</p>
+
 <div id="screen">
 <img id="deletekeep" src="delete_keep_background.png" width="362" height="283" />
 <img id="wdgt" src="widget.png" width="272" height="163" />
@@ -194,14 +227,14 @@ function HideDK()
 
 <h2 id="Download">Download</h2>
 <div style="text-align:center">
-<a href="http://solwidget.googlecode.com/files/Sol-1.3.1.wdgt.zip"><img src="Icon.png" width="75" height="75" /></a><br />
-<a href="http://solwidget.googlecode.com/files/Sol-1.3.1.wdgt.zip">Sol-1.3.1.wdgt.zip</a><span style="position:absolute"><span class="super" style="position:relative; top:-0.25em"><a href="#appleRequiredText">&#x2055;</a></span></span>
+<a href="http://solwidget.googlecode.com/files/Sol-1.3.2.wdgt.zip"><img src="Icon.png" width="75" height="75" /></a><br />
+<a href="http://solwidget.googlecode.com/files/Sol-1.3.2.wdgt.zip">Sol-1.3.2.wdgt.zip</a><span class="fakesuper"><span><span><a href="#appleRequiredText">&#x2055;</a></span></span></span>
 </div>
 
 <h2 id="History">History</h2>
 
 <span class="sidebar">
-<b>Change History</b><br />
+<i>Change History</i><br />
 The change history of Sol can be viewed <a href="CHANGELOG.txt" target="_blank">here</a>.
 </span>
 
@@ -211,7 +244,7 @@ The change history of Sol can be viewed <a href="CHANGELOG.txt" target="_blank">
 <p>Sometime in the second half of 2008 Dan's original website for Sol, <span class="link">http://captaindan.org/sw/Sol/</span>, disappeared.
 
 <span class="sidebar">
-<b>The Internet Archive</b><br />
+<i>The Internet Archive</i><br />
 The <a href="http://www.archive.org/about/about.php">Internet Archive</a> includes historical copies of web pages in its collection.
 </span>
 
@@ -238,7 +271,7 @@ Internet Archive at <a href="http://web.archive.org/web/20080609234037/http://ca
 <p>Fast forward to late August 2010 when I'm helping my neighbor with a new iMac.  I offered to install the Sol widget for him and couldn't find it on the Apple Dashboard Widgets directory.  Thinking that was no problem since I had a copy, I installed it using my copy.  Then I discovered that it wasn't possible to change the city.  And while the widget continued to display Cupertino's sunrise and sunset times just fine, that was not particularly helpful since I don't happen to live in Cupertino.
 
 <span class="sidebar">
-<b>It Works For Me!</b><br />
+<i>It Works For Me!</i><br />
 Turns out since I was still running Leopard, the helper code continued to work for me and since I hadn't tried to change the city since I had originally installed the Sol widget I hadn't noticed Dan's website (which performed the city-to-latitude/longitude lookups) had gone away either.
 </span>
 
@@ -253,7 +286,7 @@ This was all the more surprising to me because I still had several copies of the
 </p>
 
 <span class="sidebar">
-<b>Mangled Characters</b><br />
+<i>Mangled Characters</i><br />
 Start with place names some of which are encoded using <a href="http://en.wikipedia.org/wiki/Windows-1252" target="_blank">windows-1252</a> and the rest using <a href="http://en.wikipedia.org/wiki/Utf-8" target="_blank">UTF-8</a>.  Now treat all of them (including the ones that are already in UTF-8) as though they are encoded in windows-1252 and convert to UTF-8.  That is the mangled mess I found the original database dump in.
 </span>
 
@@ -270,7 +303,7 @@ Start with place names some of which are encoded using <a href="http://en.wikipe
 </p>
 
 <span class="sidebar">
-<b>Lookup Speed</b><br />
+<i>Lookup Speed</i><br />
 It turns out it's possible to shave about another 3 megabytes off the database size at the cost of quadrupling lookup times.  On older macs lookups would then take almost 8 seconds which seems totally unacceptable.
 </span>
 
@@ -290,7 +323,7 @@ It turns out it's possible to shave about another 3 megabytes off the database s
 <p>The new code that has been added to create, read and write the special, compact format places database is licensed under the GPLv3.  Because the resulting Sol.wdgt is considered a combined work the Sol widget as a whole now falls under the GPLv3 license (see the <a href="LICENSE.txt" target="_blank">LICENSE.txt</a> file for further details).
 
 <span class="sidebar">
-<b>Sol 1.2.3 License</b><br />
+<i>Sol 1.2.3 License</i><br />
 The Sol 1.2.3 License is also available in the <a href="OLDLICENSE.txt" target="_blank">OLDLICENSE.txt</a> file.  Note that while the archived copy of Dan's web site, his email to me and the README in the original Sol 1.2.3 source distribution mentions the MIT license, the text of the LICENSE file included in the Sol 1.2.3 sources distribution (and duplicated here and in the OLDLICENSE.txt file) actually matches <a href="http://www.gnu.org/licenses/license-list.html#ModifiedBSD" target="_blank">the modified BSD (aka 3-clause BSD) license</a> not the <a href="http://www.gnu.org/licenses/license-list.html#X11License" target="_blank">MIT/X11 license</a>.
 </span>
 
@@ -328,7 +361,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <p>The code that has been added to create, read and write the special format, compact database is licensed under the
 
 <span class="sidebar">
-<b>GNU General Public License Version 3</b><br />
+<i>GNU General Public License Version 3</i><br />
 The GPLv3 is also available in the <a href="COPYING.txt" target="_blank">COPYING.txt</a> file.
 </span>
 

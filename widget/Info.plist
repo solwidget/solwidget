@@ -42,9 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<key>CFBundleName</key>
 	<string>Sol</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.1</string>
+	<string>1.3.2</string>
 	<key>CFBundleVersion</key>
-	<string>1.3.1</string>
+	<string>1.3.2</string>
 	<key>CloseBoxInsetX</key>
 	<integer>9</integer>
 	<key>CloseBoxInsetY</key>

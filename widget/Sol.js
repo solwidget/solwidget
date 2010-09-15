@@ -34,7 +34,7 @@
 
 // Version number. If you change this, also change Info.plist.
 
-var gVersion = '1.3.1';
+var gVersion = '1.3.2';
 
 
 // Location and GMT offset of selected location.
