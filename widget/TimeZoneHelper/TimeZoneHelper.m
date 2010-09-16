@@ -182,88 +182,22 @@
 
 - (NSString *)myRegionCode
 {
-    static NSDictionary *mapISOToFIPS10_4 = nil;
-    
-    if (! mapISOToFIPS10_4)
-        mapISOToFIPS10_4 = [[NSDictionary alloc] initWithObjectsAndKeys:
-            @"AE", @"ae",
-            @"AR", @"ar",
-            @"AU", @"at",
-            @"AS", @"au",
-            @"BK", @"ba",
-            @"BE", @"be",
-            @"BA", @"bh",
-            @"BR", @"br",
-            @"CA", @"ca",
-            @"SZ", @"ch",
-            @"CH", @"cn",
-            @"EZ", @"cz",
-            @"GM", @"de",
-            @"DA", @"dk",
-            @"EG", @"eg",
-            @"SP", @"es",
-            @"FI", @"fi",
-            @"FR", @"fr",
-            @"UK", @"gb",
-            @"GL", @"gl",
-            @"GR", @"gr",
-            @"HK", @"hk",
-            @"HR", @"hr",
-            @"HU", @"hu",
-            @"EI", @"ie",
-            @"IS", @"il",
-            @"ID", @"id",
-            @"IN", @"in",
-            @"IC", @"is",
-            @"IT", @"it",
-            @"JA", @"jp",
-            @"JO", @"jo",
-            @"KS", @"kr",
-            @"KU", @"kw",
-            @"LE", @"lb",
-            @"LU", @"lu",
-            @"MK", @"mk",
-            @"MX", @"mx",
-            @"NL", @"nl",
-            @"NO", @"no",
-            @"NZ", @"nz",
-            @"MU", @"om",
-            @"PL", @"pl",
-            @"PO", @"pt",
-            @"QA", @"qa",
-            @"RO", @"ro",
-            @"RS", @"ru",
-            @"SA", @"sa",
-            @"SW", @"se",
-            @"SN", @"sg",
-            @"SI", @"si",
-            @"LO", @"sk",
-            @"SY", @"sy",
-            @"TU", @"tr",
-            @"TW", @"tw",
-            @"UP", @"ua",
-            @"US", @"us",
-            @"YM", @"ye",
-            @"YI", @"yu",
-            @"SF", @"za",
-            nil];
-    
     ABPerson *me = [[ABAddressBook sharedAddressBook] me];
     if (! me) return nil;
     
     ABMultiValue *addresses = [me valueForProperty:kABAddressProperty];
     NSDictionary *primaryAddress = [addresses valueAtIndex:[addresses indexForIdentifier:[addresses primaryIdentifier]]];
     
-    NSString *countryCodeFIPS10_4 = [mapISOToFIPS10_4 objectForKey:[primaryAddress objectForKey:kABAddressCountryCodeKey]];
+    NSString *countryCodeISO = [[primaryAddress objectForKey:kABAddressCountryCodeKey] uppercaseString];
     
-    if ([countryCodeFIPS10_4 isEqualToString:@"US"])
+    if ([countryCodeISO isEqualToString:@"US"])
     {
         NSString *stateCode = [primaryAddress objectForKey:kABAddressStateKey];
         if (! stateCode) return nil;
-        return [NSString stringWithFormat:@"%@/%@", countryCodeFIPS10_4, stateCode];
+        return [NSString stringWithFormat:@"%@/%@", countryCodeISO, stateCode];
     }
     else
-        return countryCodeFIPS10_4;
+        return countryCodeISO;
 }
 
 - (NSString *)myCityName
