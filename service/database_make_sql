@@ -37,6 +37,10 @@ fi
 mereal="$(basename "$me")"
 me="$(basename "$0")"
 dbfile="$medir/database_values"
+if [ $# -gt 1 ] || [ $# = 1 -a x"$1" != x"--index" ]; then
+  echo "Usage: $0 [--index] | sqlite3 newdb.sq3"
+  exit 1
+fi
 for dbcheck in "$dbfile.001.txt" "$dbfile.002.txt" "$dbfile.003.txt" "$dbfile.004.txt"; do
   if [ ! -r "$dbcheck" ]; then
     echo "Cannot find readable '$dbcheck' file" >&2
@@ -103,16 +107,26 @@ linesuf=');'
     done
   fi
 }
-cat << SUFFIX
+cat << SUFFIX1
 
 -- UNLOCK TABLES;
 
+SUFFIX1
+if [ x"$1" != x"--index" ]; then
+  echo '/*'
+fi
+cat << INDEX
 CREATE INDEX 'sol_places.sol_places_name' ON 'sol_places' ("name");
 CREATE INDEX 'sol_places.sol_places_uc_name' ON 'sol_places' ("uc_name");
 CREATE INDEX 'sol_places.sol_places_uc_alt_name' ON 'sol_places' ("uc_alt_name");
 CREATE INDEX 'sol_places.sol_places_region' ON 'sol_places' ("region");
 CREATE INDEX 'sol_places.sol_places_latitude_longitude' ON 'sol_places' ("latitude","longitude");
 CREATE INDEX 'sol_places.sol_places_time_zone' ON 'sol_places' ("time_zone");
+INDEX
+if [ x"$1" != x"--index" ]; then
+  echo '*/'
+fi
+cat << SUFFIX2
 
 /*!40000 ALTER TABLE "sol_places" ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -126,4 +140,4 @@ CREATE INDEX 'sol_places.sol_places_time_zone' ON 'sol_places' ("time_zone");
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 END TRANSACTION;
-SUFFIX
+SUFFIX2
