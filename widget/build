@@ -28,12 +28,22 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+if [ $# -gt 1 ] || [ $# = 1 -a x"$1" != x"--debug" ]; then
+  echo "Usage: $0 [--debug]"
+  exit 1
+fi
+config=Release
+suffix=
+if [ x"$1" = x"--debug" ]; then
+  config=Debug
+  suffix=-debug
+fi
 set -e
 if [ -e Sol.wdgt ]; then
   echo "Sol.wdgt already exists, remove it first"
   exit 1
 fi
-xcodebuild -project TimeZoneHelper/TimeZoneHelper.xcodeproj -configuration Release
+xcodebuild -project TimeZoneHelper/TimeZoneHelper.xcodeproj -configuration $config
 if [ ../service/database_values.txt -nt ../service/database.gz ]; then
   (cd ../service; ./compact_make_db)
 fi
@@ -55,13 +65,15 @@ cp \
   Info.plist       \
   Sol.wdgt/
 cp -r localizations/*.lproj Sol.wdgt/
-cp -r TimeZoneHelper/build/Release/TimeZoneHelper.bundle Sol.wdgt/
-strip -S -x -u Sol.wdgt/TimeZoneHelper.bundle/Contents/MacOS/TimeZoneHelper
+cp -r TimeZoneHelper/build/$config/TimeZoneHelper.bundle Sol.wdgt/
+if [ x"$1" != x"--debug" ]; then
+  strip -S -x -u Sol.wdgt/TimeZoneHelper.bundle/Contents/MacOS/TimeZoneHelper
+fi
 find Sol.wdgt -name '.*' -print0 | xargs -0 rm -rf
 find Sol.wdgt -type f -print0 | xargs -0I% sh -c "f='%';"' cat "$f" > "$f.tmp"; if [ -x "$f" ]; then chmod a+x "$f.tmp"; fi; mv -f "$f.tmp" "$f"'
 cat ../service/database.gz > Sol.wdgt/TimeZoneHelper.bundle/Contents/Resources/database.gz
 stamp="`TZ=Z date +%Y%m%d`0000"
 find Sol.wdgt -print0 | TZ=Z xargs -0 touch -t "$stamp"
-rm -f Sol.wdgt.zip
-zip -X -9 -r Sol.wdgt.zip Sol.wdgt
-TZ=Z touch -t "$stamp" Sol.wdgt.zip
+rm -f Sol.wdgt$suffix.zip
+zip -X -9 -r Sol.wdgt$suffix.zip Sol.wdgt
+TZ=Z touch -t "$stamp" Sol.wdgt$suffix.zip
