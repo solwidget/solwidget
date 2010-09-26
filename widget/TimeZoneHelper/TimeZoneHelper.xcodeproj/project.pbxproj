@@ -23,6 +23,7 @@
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		272726B1122DCD470008690A /* soldatabase.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = soldatabase.c; sourceTree = "<group>"; };
 		272726B2122DCD470008690A /* soldatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = soldatabase.h; sourceTree = "<group>"; };
+		275E8863124EBF5E00B695FD /* city_table.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = city_table.inc; sourceTree = "<group>"; };
 		32DBCF630370AF2F00C91783 /* TimeZoneHelper_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeZoneHelper_Prefix.pch; sourceTree = "<group>"; };
 		37A940CA09746EED00B6DA5C /* TimeZoneHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeZoneHelper.h; sourceTree = "<group>"; };
 		37A940CB09746EED00B6DA5C /* TimeZoneHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeZoneHelper.m; sourceTree = "<group>"; };
@@ -86,6 +87,7 @@
 				37A940CB09746EED00B6DA5C /* TimeZoneHelper.m */,
 				272726B2122DCD470008690A /* soldatabase.h */,
 				272726B1122DCD470008690A /* soldatabase.c */,
+				275E8863124EBF5E00B695FD /* city_table.inc */,
 			);
 			name = Sources;
 			sourceTree = "<group>";

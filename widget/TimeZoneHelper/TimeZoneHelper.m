@@ -39,8 +39,64 @@
 #import <Foundation/Foundation.h>
 #import <WebKit/WebKit.h>
 #import <stdio.h>
+#import <stdlib.h>
 
 @implementation TimeZoneHelper
+
+typedef struct city_entry_s {
+    const NSString *selected_city;
+    const NSString *selected_country;
+    const NSString *db_city;
+    const NSString *db_region;
+} city_entry_t;
+
+static const city_entry_t city_table[222] = {
+    #include "city_table.inc"
+};
+#define city_table_size (sizeof(city_table)/sizeof(city_table[0]))
+
+static int compare_city(const void *p1, const void *p2)
+{
+  const city_entry_t *e1 = (const city_entry_t *)p1;
+  const city_entry_t *e2 = (const city_entry_t *)p2;
+  int cmp = [e1->selected_city caseInsensitiveCompare:
+                                                (NSString *)e2->selected_city];
+  if (cmp) return cmp;
+  return [e1->selected_country caseInsensitiveCompare:
+                                             (NSString *)e2->selected_country];
+}
+
+- (const city_entry_t *)lastSelectedCity
+{
+    city_entry_t search, *found;
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    NSArray *selectedCityPref =
+        [[NSUserDefaults standardUserDefaults]
+            arrayForKey: @"com.apple.TimeZonePref.Last_Selected_City"];
+    if (!selectedCityPref)
+    {
+        [pool drain];
+        return NULL;
+    }
+    if ([selectedCityPref count] < 7)
+    {
+        /* should have 9 or 10 elements be we only access indicies 5 & 6 */
+        [pool drain];
+        return NULL;
+    }
+    search.selected_city = (NSString *)[selectedCityPref objectAtIndex: 5];
+    search.selected_country = (NSString *)[selectedCityPref objectAtIndex: 6];
+    if (![search.selected_city isKindOfClass: [NSString class]]
+        || ![search.selected_country isKindOfClass: [NSString class]])
+    {
+        [pool drain];
+        return NULL;
+    }
+    found = (city_entry_t *)bsearch(&search, city_table, city_table_size,
+        sizeof(city_entry_t), compare_city);
+    [pool drain];
+    return found;
+}
 
 - (id)initWithWebView:(WebView *)webview
 {
@@ -58,6 +114,18 @@
         [_lastName retain];
         _lastResult = [NSString stringWithString: @"<s></s>"];
         [_lastResult retain];
+#ifndef NDEBUG
+        {
+            const city_entry_t *sel_city = [self lastSelectedCity];
+            if (sel_city)
+            {
+                NSLog(@"City: %@  Region: %@\n",
+                    sel_city->db_city, sel_city->db_region);
+            }
+            else
+                NSLog(@"No last selected city found\n");
+        }
+#endif
     }
     return self;
 }
@@ -182,6 +250,9 @@
 
 - (NSString *)myRegionCode
 {
+    const city_entry_t *lastCity = [self lastSelectedCity];
+    if (lastCity) return (NSString *)lastCity->db_region;
+
     ABPerson *me = [[ABAddressBook sharedAddressBook] me];
     if (! me) return nil;
     
@@ -202,6 +273,9 @@
 
 - (NSString *)myCityName
 {
+    const city_entry_t *lastCity = [self lastSelectedCity];
+    if (lastCity) return (NSString *)lastCity->db_city;
+
     ABPerson *me = [[ABAddressBook sharedAddressBook] me];
     if (! me) return nil;
     
