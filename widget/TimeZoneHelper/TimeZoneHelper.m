@@ -80,7 +80,7 @@ static int compare_city(const void *p1, const void *p2)
     }
     if ([selectedCityPref count] < 7)
     {
-        /* should have 9 or 10 elements be we only access indicies 5 & 6 */
+        /* should have 9 or 10 elements but we only access indicies 5 & 6 */
         [pool drain];
         return NULL;
     }
