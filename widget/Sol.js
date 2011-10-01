@@ -1331,7 +1331,7 @@ function mapURL()
     return 'http://maps.google.com/maps?q='
         + gLatitude + ',' + gLongitude
         + '+(' + encodeMapQuery(locName) + ')'
-        + '&mrt=ds&z=13';
+        + '&z=13&iwloc=A';
 }
 
 
