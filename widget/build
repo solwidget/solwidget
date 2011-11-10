@@ -69,6 +69,16 @@ cp -r TimeZoneHelper/build/$config/TimeZoneHelper.bundle Sol.wdgt/
 if [ x"$1" != x"--debug" ]; then
   strip -S -x -u Sol.wdgt/TimeZoneHelper.bundle/Contents/MacOS/TimeZoneHelper
 fi
+# Apple has lately started to pollute the Info.plist files with lots of
+# unnecessary, extraneous garbage.  Here we zap it all out!  FUA!
+PLB=/usr/libexec/PlistBuddy
+GARBAGEKEYS="
+  BuildMachineOSBuild DTCompiler DTPlatformBuild DTPlatformVersion DTSDKBuild
+  DTSDKName DTXcode DTXcodeBuild
+  "
+for garbage in $GARBAGEKEYS; do
+  $PLB -c "Delete :$garbage" Sol.wdgt/TimeZoneHelper.bundle/Contents/Info.plist 2> /dev/null || :
+done
 find Sol.wdgt -name '.*' -print0 | xargs -0 rm -rf
 find Sol.wdgt -type f -print0 | xargs -0I% sh -c "f='%';"' cat "$f" > "$f.tmp"; if [ -x "$f" ]; then chmod a+x "$f.tmp"; fi; mv -f "$f.tmp" "$f"'
 cat ../service/database.gz > Sol.wdgt/TimeZoneHelper.bundle/Contents/Resources/database.gz
