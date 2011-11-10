@@ -155,6 +155,8 @@ static int compare_city(const void *p1, const void *p2)
         return @"lookupPlaceInRegionWithName";
     if (aSelector == @selector(setTimeZoneWithName:))
         return @"setTimeZoneWithName";
+    if (aSelector == @selector(timeOffsetHoursForDate:))
+        return @"timeOffsetHoursForDate";
 
     return nil;
 }
@@ -178,6 +180,8 @@ static int compare_city(const void *p1, const void *p2)
     if (aSelector == @selector(setTimeZoneWithName:))
         return NO;
     if (aSelector == @selector(timeOffsetHours))
+        return NO;
+    if (aSelector == @selector(timeOffsetHoursForDate:))
         return NO;
 
     return YES;
@@ -210,6 +214,13 @@ static int compare_city(const void *p1, const void *p2)
 - (double)timeOffsetHours
 {
     return [_timeZone secondsFromGMT] / 3600.0;
+}
+
+- (double)timeOffsetHoursForDate:(double)dateMillis
+{
+    /* dateMillis is a JavaScript UTC milliseconds since 1970 value */
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970: dateMillis / 1000.0];
+    return [_timeZone secondsFromGMTForDate: date] / 3600.0;
 }
 
 - (NSString *)formattedTimeForHours:(double)hours

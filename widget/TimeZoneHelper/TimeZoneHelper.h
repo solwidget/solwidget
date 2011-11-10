@@ -50,6 +50,7 @@
 
 - (void)setTimeZoneWithName:(NSString *)name;
 - (double)timeOffsetHours;
+- (double)timeOffsetHoursForDate:(double)dateMillis;
 - (NSString *)formattedTimeForHours:(double)hours;
 - (NSString *)lookupPlaceInRegion:(NSString *)region withName:(NSString *)name;
 
