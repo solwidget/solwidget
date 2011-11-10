@@ -32,7 +32,7 @@
 - Development restarted with new developer
 - Works on Snow Leopard
 - Esc, Return, Enter work on back side
-- Back side controls no longer drag widget (which means text in city box is no mouse-selectable)
+- Back side controls no longer drag widget (which means text in city box is now mouse-selectable)
 - Places database now included with widget -- no server required anymore!
 - City lookups improved
 - Places database dump cleaned up to be usable (was in mangled character set)
