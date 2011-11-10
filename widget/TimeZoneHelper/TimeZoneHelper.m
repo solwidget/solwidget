@@ -207,12 +207,12 @@ static int compare_city(const void *p1, const void *p2)
     _timeZone = [newTimeZone retain];
 }
 
-- (float)timeOffsetHours
+- (double)timeOffsetHours
 {
     return [_timeZone secondsFromGMT] / 3600.0;
 }
 
-- (NSString *)formattedTimeForHours:(float)hours
+- (NSString *)formattedTimeForHours:(double)hours
 {
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setTimeZone:_timeZone];
@@ -220,7 +220,7 @@ static int compare_city(const void *p1, const void *p2)
     [formatter setDateStyle:NSDateFormatterNoStyle];
     
     unsigned wholeHours = floor(hours);
-    unsigned minutes    = floor((hours - (float) wholeHours) * 60.0);
+    unsigned minutes    = floor((hours - (double) wholeHours) * 60.0);
     unsigned seconds    = (hours * 60.0) - floor(hours * 60.0);
     
     NSCalendarDate *date = [NSCalendarDate calendarDate];
