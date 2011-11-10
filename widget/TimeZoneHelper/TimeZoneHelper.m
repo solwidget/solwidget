@@ -237,6 +237,7 @@ static int compare_city(const void *p1, const void *p2)
     NSString *formattedTime = [formatter stringFromDate:date];
     
     [formatter release];
+    [date release];
     
     
     // This hack prevents layout issues when a German-speaking user has "Uhr" on the end of their time format.
