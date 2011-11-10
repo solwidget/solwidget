@@ -1,7 +1,7 @@
 /*
    database_test.c version 1.0.0
    Tests reading and searching the compressed, compact database
-   Copyright (C) 2010 Kyle J. McKay.  All rights reserved.
+   Copyright (C) 2010,2011 Kyle J. McKay.  All rights reserved.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

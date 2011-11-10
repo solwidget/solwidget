@@ -3,8 +3,8 @@
 //  TimeZoneHelper
 //
 //  Created by Dan Neumeyer on 2006-01-10
-//  Copyright 2006 Daniel S. Neumeyer
-//  Portions Copyright (C) 2010 Kyle J. McKay
+//  Copyright (C) 2006 Daniel S. Neumeyer
+//  Portions Copyright (C) 2010,2011 Kyle J. McKay
 //  All Rights Reserved
 //
 //

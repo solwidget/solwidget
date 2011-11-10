@@ -4,7 +4,7 @@
 
 Sol Widget TimeZoneHelper Info.plist
 Copyright (C) 2006 Daniel S. Neumeyer
-Portions Copyright (C) 2010 Kyle J. McKay
+Portions Copyright (C) 2010,2011 Kyle J. McKay
 All rights reserved
 
 Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2006 Daniel S. Neumeyer.
-Portions Copyright © 2010 Kyle J McKay.
+Portions Copyright © 2010,2011 Kyle J McKay.
 All rights reserved.</string>
 	<key>NSPrincipalClass</key>
 	<string>TimeZoneHelper</string>
