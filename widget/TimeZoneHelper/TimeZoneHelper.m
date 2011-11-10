@@ -147,8 +147,8 @@ static int compare_city(const void *p1, const void *p2)
 
 + (NSString *)webScriptNameForSelector:(SEL)aSelector
 {
-    if (aSelector == @selector(formattedTimeForHours:))
-        return @"formattedTimeForHours";
+    if (aSelector == @selector(formattedTimeForDate:))
+        return @"formattedTimeForDate";
     if (aSelector == @selector(log:))
         return @"log";
     if (aSelector == @selector(lookupPlaceInRegion:withName:))
@@ -165,7 +165,7 @@ static int compare_city(const void *p1, const void *p2)
 {
     if (aSelector == @selector(allTimeZones))
         return NO;
-    if (aSelector == @selector(formattedTimeForHours:))
+    if (aSelector == @selector(formattedTimeForDate:))
         return NO;
     if (aSelector == @selector(localTimeZoneName))
         return NO;
@@ -223,32 +223,18 @@ static int compare_city(const void *p1, const void *p2)
     return [_timeZone secondsFromGMTForDate: date] / 3600.0;
 }
 
-- (NSString *)formattedTimeForHours:(double)hours
+- (NSString *)formattedTimeForDate:(double)dateMillis
 {
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setTimeZone:_timeZone];
     [formatter setTimeStyle:NSDateFormatterShortStyle];
     [formatter setDateStyle:NSDateFormatterNoStyle];
     
-    unsigned wholeHours = floor(hours);
-    unsigned minutes    = floor((hours - (double) wholeHours) * 60.0);
-    unsigned seconds    = (hours * 60.0) - floor(hours * 60.0);
-    
-    NSCalendarDate *date = [NSCalendarDate calendarDate];
-    [date setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
-    
-    date = [[NSCalendarDate alloc] initWithYear:[date yearOfCommonEra]
-                                          month:[date monthOfYear]
-                                            day:[date dayOfMonth]
-                                           hour:wholeHours
-                                         minute:minutes
-                                         second:seconds
-                                       timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+    NSDate *date = [NSDate dateWithTimeIntervalSince1970: dateMillis / 1000.0];
     
     NSString *formattedTime = [formatter stringFromDate:date];
     
     [formatter release];
-    [date release];
     
     
     // This hack prevents layout issues when a German-speaking user has "Uhr" on the end of their time format.
