@@ -147,37 +147,37 @@ static int compare_city(const void *p1, const void *p2)
 
 + (NSString *)webScriptNameForSelector:(SEL)aSelector
 {
-    if (aSelector == @selector(setTimeZoneWithName:))
-        return @"setTimeZoneWithName";
     if (aSelector == @selector(formattedTimeForHours:))
         return @"formattedTimeForHours";
-    if (aSelector == @selector(lookupPlaceInRegion:withName:))
-        return @"lookupPlaceInRegionWithName";
     if (aSelector == @selector(log:))
         return @"log";
+    if (aSelector == @selector(lookupPlaceInRegion:withName:))
+        return @"lookupPlaceInRegionWithName";
+    if (aSelector == @selector(setTimeZoneWithName:))
+        return @"setTimeZoneWithName";
 
     return nil;
 }
 
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
 {
+    if (aSelector == @selector(allTimeZones))
+        return NO;
+    if (aSelector == @selector(formattedTimeForHours:))
+        return NO;
     if (aSelector == @selector(localTimeZoneName))
         return NO;
-    if (aSelector == @selector(allTimeZones))
+    if (aSelector == @selector(log:))
+        return NO;
+    if (aSelector == @selector(lookupPlaceInRegion:withName:))
+        return NO;
+    if (aSelector == @selector(myCityName))
+        return NO;
+    if (aSelector == @selector(myRegionCode))
         return NO;
     if (aSelector == @selector(setTimeZoneWithName:))
         return NO;
     if (aSelector == @selector(timeOffsetHours))
-        return NO;
-    if (aSelector == @selector(formattedTimeForHours:))
-        return NO;
-    if (aSelector == @selector(myRegionCode))
-        return NO;
-    if (aSelector == @selector(myCityName))
-        return NO;
-    if (aSelector == @selector(lookupPlaceInRegion:withName:))
-        return NO;
-    if (aSelector == @selector(log:))
         return NO;
 
     return YES;
