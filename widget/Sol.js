@@ -53,7 +53,6 @@ var gCountryName;
 var gCountryCode;
 var gLatitude;
 var gLongitude;
-var gTimeOffset;
 
 
 // Buttons... not actually used after instantiation.
@@ -182,12 +181,21 @@ function isBackSide()
 // Parameters
 //    latitude - latitude in degrees of location
 //   longitude - longitude in degrees of location
-//        date - Date object representing day to calculate
+//        date - milliseconds since 1970 of time on day to calculate times for
 //     sunrise - Boolean value indicating whether to calculate sunrise (true) or sunset (false)
 //    twilight - Boolean value indicating whether to calculate twilight (true) or sunrise/sunset (false)
 //
+//   NOTE: date is treated as UTC and the UTC day, month and year is then extracted to indicate
+//         which day to calculate the sunrise/sunset for.  If, for example, the current time
+//         is 1700 hrs local time and local time is 8 hours behind UTC, then passing in the
+//         current time's date.getTime() would result in calculating the sunrise/sunset for the
+//         day after since 1700 hrs local time in a time zone 8 hours behind UTC is actually
+//         0100 hrs the day after in UTC.
+//
 // Returns
-//   floating-point hour of sun event in UTC (e.g., 5.15 => 0509Z), or null if the event doesn't occur on the given day
+//   milliseconds since 1970 GMT of event, or null if the event doesn't occur on the given day
+//   can also return NaN to indicate the event doesn't occur on the given day but is still ongoing
+//   (use new Date(return_value) to get a Date object if the result is not null and not NaN)
 //
 function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
 {
@@ -197,15 +205,17 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     //   United States Naval Observatory
     //   Washington, DC 20392
 
-    day   = date.getDate();
-    month = date.getMonth() + 1;
-    year  = date.getFullYear();
+    var utc = new Date(date);
+    utc.setUTCHours(0, 0, 0, 0); // For later use in computing return value
+    var day   = utc.getUTCDate();
+    var month = utc.getUTCMonth() + 1;
+    var year  = utc.getUTCFullYear();
     
     var zenith;
     
     if (twilight)
     {
-        twilightSelect = document.getElementById('twilight');
+        var twilightSelect = document.getElementById('twilight');
         zenith = twilightSelect.value;
     }
     else
@@ -213,14 +223,16 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     
     
     // Calculate the day of the year.
-    
-    N1 = Math.floor(275.0 * month / 9.0);
-    N2 = Math.floor((month + 9.0) / 12.0);
-    N3 = 1.0 + Math.floor((year - 4.0 * Math.floor(year / 4.0) + 2.0) / 3.0);
-    N = N1 - (N2 * N3) + day - 30.0;
+
+    var N1 = Math.floor(275.0 * month / 9.0);
+    var N2 = Math.floor((month + 9.0) / 12.0);
+    var N3 = 1.0 + Math.floor((year - 4.0 * Math.floor(year / 4.0) + 2.0) / 3.0);
+    var N = N1 - (N2 * N3) + day - 30.0;
     
     
     // Convert the longitude to hour value and calculate an approximate time.
+
+    var lngHour, t;
     
     lngHour = longitude / 15.0;
     
@@ -232,12 +244,12 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     
     // Calculate the sun's mean anomaly.
     
-    M = (0.9856 * t) - 3.289;
+    var M = (0.9856 * t) - 3.289;
     
     
     // Calculate the sun's true longitude.
     
-    L = M + (1.916 * sinD(M)) + (0.020 * sinD(2 * M)) + 282.634;
+    var L = M + (1.916 * sinD(M)) + (0.020 * sinD(2 * M)) + 282.634;
     
     while (L >= 360) L -= 360.0;
     while (L <  0)   L += 360.0;
@@ -245,7 +257,7 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     
     // Caculate the sun's right ascension.
     
-    RA = atanD(0.91764 * tanD(L));
+    var RA = atanD(0.91764 * tanD(L));
     
     while (RA >= 360) RA -= 360.0;
     while (RA <  0)   RA += 360.0;
@@ -253,8 +265,8 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     
     // Right ascension value needs to be in the same quadrant as L.
     
-    Lquadrant = Math.floor(L / 90.0) * 90.0;
-    RAquadrant = Math.floor(RA / 90.0) * 90.0;
+    var Lquadrant = Math.floor(L / 90.0) * 90.0;
+    var RAquadrant = Math.floor(RA / 90.0) * 90.0;
     RA = RA + (Lquadrant - RAquadrant);
     
     
@@ -265,13 +277,13 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     
     // Calculate the sun's declination.
     
-    sinDec = 0.39782 * sinD(L);
-    cosDec = cosD(asinD(sinDec));
+    var sinDec = 0.39782 * sinD(L);
+    var cosDec = cosD(asinD(sinDec));
     
     
     // Calculate the sun's local hour angle.
     
-    cosH = (cosD(zenith) - (sinDec * sinD(latitude))) / (cosDec * cosD(latitude));
+    var cosH = (cosD(zenith) - (sinDec * sinD(latitude))) / (cosDec * cosD(latitude));
     
     if (sunrise)
     {
@@ -285,6 +297,8 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     
     // Finish calculating H and convert into hours.
     
+    var H;
+
     if (sunrise)
         H = 360.0 - acosD(cosH);
     else
@@ -295,18 +309,20 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     
     // Calculate local mean time of rising.
     
-    T = H + RA - (0.06571 * t) - 6.622;
+    var T = H + RA - (0.06571 * t) - 6.622;
     
     
+    // Normalize to [0,24) range
+
+    while (T >= 24) T -= 24.0;
+    while (T <  0)  T += 24.0;
+
+
     // Adjust back to UTC.
     
-    UT = T - lngHour;
+    var UT = T - lngHour;
     
-    while (UT >= 24) UT -= 24.0;
-    while (UT <  0)  UT += 24.0;
-    
-    
-    return UT;
+    return utc.getTime() + (UT * 3600000.0);  // multiply UT by milliseconds per hour
 }
 
 
@@ -324,6 +340,7 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
 // Returns
 //   floating-point hour of moon event in UTC (e.g., 5.15 => 0509Z), or null if the event doesn't occur on the given day; if neither event occurs, a third element indicates whether the moon is visible
 //
+// TODO: Needs to be converted to have i/o UTC millis like CalculateSunriseOrSunset in order to be used
 function CalculateMoonriseOrMoonset(latitude, longitude, date, moonrise)
 {
     // Source: Sky & Telescope magazine, July 1989, p78
@@ -514,7 +531,7 @@ function LocalizedStringForKey(key)
 //
 function SetText(id, text)
 {
-    obj = document.getElementById(id);
+    var obj = document.getElementById(id);
     
     while (obj.firstChild)
         obj.removeChild(obj.firstChild);
@@ -533,7 +550,7 @@ function SetText(id, text)
 //
 function SetTextTitle(id, text)
 {
-    obj = document.getElementById(id);
+    var obj = document.getElementById(id);
 
     obj.setAttribute('title', text);
 }
@@ -542,10 +559,10 @@ function SetTextTitle(id, text)
 // -- TimeString --
 //
 // Returns a string representation of a given time, formatted with the user's
-// short time format.
+// short time format in the location's time zone.
 //
 // Parameters
-//   hours - time in hours (floating point)
+//   hours - time in milliseconds since 1970 GMT
 //
 // Returns
 //   string representation of given time
@@ -554,22 +571,7 @@ function TimeString(hours)
 {
     if (hours == null) return '';
     
-    if (window.TimeZoneHelper)
-        return window.TimeZoneHelper.formattedTimeForHours(hours);
-    else
-    {
-        hours += gTimeOffset;
-        
-        wholeHours = Math.floor(hours);
-        minutes = Math.round((hours - Math.floor(hours)) * 60.0);
-        
-        return String(wholeHours > 12 ? wholeHours - 12 : wholeHours)
-            + ':'
-            + ((minutes < 10) ? '0' : '')
-            + String(minutes)
-            + ' '
-            + (wholeHours > 11 ? 'PM' : 'AM');
-    }
+    return window.TimeZoneHelper.formattedTimeForDate(hours);
 }
 
 
@@ -581,7 +583,12 @@ function WidgetDidShow()
 {
     if (gClockTimeout) clearTimeout(gClockTimeout);
     Redraw();
-    gClockTimeout = setTimeout('WidgetDidShow();', 300000);
+    // The clock hand is 59 pixels long, this corresponds to a 1 pixel movement
+    // at the end of the hand when it is rotated by an amount approximately
+    // corresponding to 233 seconds.  We use half that just to be sure (in case
+    // anti-aliasing is being used to draw the hand) which is just under two
+    // minutes.
+    gClockTimeout = setTimeout('WidgetDidShow();', 116000);
 }
 
 
@@ -598,6 +605,25 @@ function WidgetDidHide()
     }
 }
 
+// -- MillisToDrawRadians --
+//
+// Converts a UTC time in milliseconds since 1970 GMT first to a number of
+// radians for drawing that represents the time in the local time of the
+// selected location on the 24hr clock face.
+// The hourOffset value is a floating point number of HOURS to adjust the time
+// by before computing the radians (it's ADDED to the computed hours time)
+// The result will be normalized to the range [0,2Pi).
+//
+function MillisToDrawRadians(millis, hourOffset)
+{
+  if (isNaN(millis) || isNull(millis)) return millis;
+  var utc = new Date(millis + window.TimeZoneHelper.timeOffsetMillisForDate(millis));
+  var hours = utc.getUTCHours() + (utc.getUTCMinutes() / 60.0) + (utc.getUTCSeconds() / 3600.0);
+  hours += hourOffset;
+  while (hours >= 24.0) hours -= 24.0;
+  while (hours <   0.0) hours += 24.0;
+  return (hours / 24.0) * 6.28318530717959;
+}
 
 // -- Redraw --
 //
@@ -606,16 +632,20 @@ function WidgetDidHide()
 function Redraw()
 {
     // Calculate sunrise, sunset, dawn, and dusk.
-    
-    sunrise = CalculateSunriseOrSunset(gLatitude, gLongitude, new Date(), true, false);
-    sunset  = CalculateSunriseOrSunset(gLatitude, gLongitude, new Date(), false, false);
-    morningTwilight = CalculateSunriseOrSunset(gLatitude, gLongitude, new Date(), true, true);
-    eveningTwilight = CalculateSunriseOrSunset(gLatitude, gLongitude, new Date(), false, true);
-//  moonrise = CalculateMoonriseOrMoonset(gLatitude, gLongitude, new Date(), true);
-//  moonset = CalculateMoonriseOrMoonset(gLatitude, gLongitude, new Date(), false);
 
-    sunAlwaysUp   = (isNaN(sunrise) && isNull(sunset));
-    sunAlwaysDown = (isNaN(sunset) && isNull(sunrise));
+    var nowDate = new Date();
+    var nowMillis = nowDate.getTime();
+    nowMillis += window.TimeZoneHelper.timeOffsetMillisForDate(nowMillis);
+
+    var sunrise = CalculateSunriseOrSunset(gLatitude, gLongitude, nowMillis, true, false);
+    var sunset  = CalculateSunriseOrSunset(gLatitude, gLongitude, nowMillis, false, false);
+    var morningTwilight = CalculateSunriseOrSunset(gLatitude, gLongitude, nowMillis, true, true);
+    var eveningTwilight = CalculateSunriseOrSunset(gLatitude, gLongitude, nowMillis, false, true);
+//  var moonrise = CalculateMoonriseOrMoonset(gLatitude, gLongitude, nowMillis, true);
+//  var moonset = CalculateMoonriseOrMoonset(gLatitude, gLongitude, nowMillis, false);
+
+    var sunAlwaysUp   = (isNaN(sunrise) && isNull(sunset));
+    var sunAlwaysDown = (isNaN(sunset) && isNull(sunrise));
     
     
     // Update digital displays.
@@ -647,18 +677,18 @@ function Redraw()
     
     // Convert times to radians for drawing analog clock.
     
-    morningTwilightRadians = (morningTwilight + 6.0 + gTimeOffset) / 24.0 * 6.28318530717959;
-    sunriseRadians         = (sunrise + 6.0 + gTimeOffset)         / 24.0 * 6.28318530717959;
-    sunsetRadians          = (sunset + 6.0 + gTimeOffset)          / 24.0 * 6.28318530717959;
-    eveningTwilightRadians = (eveningTwilight + 6.0 + gTimeOffset) / 24.0 * 6.28318530717959;
-//  moonriseRadians        = (moonrise + 6.0 + gTimeOffset)        / 24.0 * 6.28318530717959;
-//  moonsetRadians         = (moonset + 6.0 + gTimeOffset)         / 24.0 * 6.28318530717959;
+    var morningTwilightRadians = MillisToDrawRadians(morningTwilight, 6.0);
+    var sunriseRadians         = MillisToDrawRadians(sunrise, 6.0);
+    var sunsetRadians          = MillisToDrawRadians(sunset, 6.0);
+    var eveningTwilightRadians = MillisToDrawRadians(eveningTwilight, 6.0);
+//  var moonriseRadians        = MillisToDrawRadians(moonrise, 6.0);
+//  var moonsetRadians         = MillisToDrawRadians(moonset, 6.0);
     
     
     // Prepare canvas.
     
-    canvas = document.getElementById('clock');
-    context = canvas.getContext('2d');
+    var canvas = document.getElementById('clock');
+    var context = canvas.getContext('2d');
     
     context.clearRect(0, 0, 100, 100);
     
@@ -773,10 +803,10 @@ function Redraw()
     
     // Draw moon arc.
     
-/*  moonArcThickness = 6;
+/*  var moonArcThickness = 6;
     
-    moonDoesRise = (moonriseRadians != null);
-    moonDoesSet  = (moonsetRadians  != null);
+    var moonDoesRise = (moonriseRadians != null);
+    var moonDoesSet  = (moonsetRadians  != null);
     
     if (! moonDoesRise) moonriseRadians = moonsetRadians + 0.075;
     if (! moonDoesSet)  moonsetRadians  = moonriseRadians - 0.075;
@@ -785,8 +815,8 @@ function Redraw()
     context.moveTo(0, 0);
     context.arc(0, 0, 40, moonriseRadians, moonsetRadians, false);
     
-    endPointX = (40 - moonArcThickness / 2.0) * Math.cos(moonsetRadians);
-    endPointY = (40 - moonArcThickness / 2.0) * Math.sin(moonsetRadians);
+    var endPointX = (40 - moonArcThickness / 2.0) * Math.cos(moonsetRadians);
+    var endPointY = (40 - moonArcThickness / 2.0) * Math.sin(moonsetRadians);
     context.arc(endPointX, endPointY, moonArcThickness / 2.0, moonsetRadians, moonsetRadians + 3.14159, ! moonDoesSet);
     
     context.arc(0, 0, 40 - moonArcThickness, moonsetRadians, moonriseRadians, true);
@@ -802,11 +832,7 @@ function Redraw()
 
     // Convert current time to radians.
     
-    nowDate = new Date();
-    nowDate = new Date(nowDate - -nowDate.getTimezoneOffset() * 60000);
-    now = nowDate.getHours() + (nowDate.getMinutes() / 60.0);
-    now += gTimeOffset;
-    nowRadians = ((now + 12.0) / 24.0) * 6.28318530717959;
+    var nowRadians = MillisToDrawRadians(nowDate.getTime(), 12.0);
     
     
     // Draw clock hand.
@@ -858,16 +884,15 @@ function CityRequestHandler()
 {
     if (gCityRequest.readyState != 4 || gCityRequest.status != 200) return;
     
-    results = gCityRequest.responseXML.getElementsByTagName('r');
+    var results = gCityRequest.responseXML.getElementsByTagName('r');
     if (results.length == 0) return;
     
     gPlaceName = results[0].getElementsByTagName('n')[0].firstChild.nodeValue;
     gLatitude  = results[0].getElementsByTagName('a')[0].firstChild.nodeValue;
     gLongitude = results[0].getElementsByTagName('o')[0].firstChild.nodeValue;
-    timeZone   = results[0].getElementsByTagName('t')[0].firstChild.nodeValue;
+    var timeZone = results[0].getElementsByTagName('t')[0].firstChild.nodeValue;
     
     window.TimeZoneHelper.setTimeZoneWithName(timeZone);
-    gTimeOffset = window.TimeZoneHelper.timeOffsetHours();
     
     gStateName   = gLookupStateName;
     gCountryName = gLookupCountryName;
@@ -924,8 +949,8 @@ function RestoreSettings()
 //
 function FlipToBack()
 {
-    front = document.getElementById("front");
-    back  = document.getElementById("back");
+    var front = document.getElementById("front");
+    var back  = document.getElementById("back");
     
     if (gClockOnly)
     {
@@ -959,10 +984,10 @@ function PerformLookupWith(name, state, countryName, countryCode, executeNow)
 
     // Start location lookup.
 /*
-    re = /\//;
-    urlRegion = regionCode.replace(re, '%2f');
+    var re = /\//;
+    var urlRegion = regionCode.replace(re, '%2f');
 
-    url = 'http://captaindan.org/services/solplaces/?v=' + gVersion + '&r=' + urlRegion + '&n=' + name;
+    var url = 'http://captaindan.org/services/solplaces/?v=' + gVersion + '&r=' + urlRegion + '&n=' + name;
 
     if (gCityRequest) gCityRequest.abort();
     gCityRequest = new XMLHttpRequest();
@@ -999,19 +1024,19 @@ function PerformLookup(executeNow)
     // Save preferences.
     
     var countryMenu = document.getElementById('country');
-    country = countryMenu.options[countryMenu.selectedIndex].value;
+    var country = countryMenu.options[countryMenu.selectedIndex].value;
     widget.setPreferenceForKey(country, widget.identifier + '-selectedRegion');
     
     if (country == 'US')
     {
-        state = document.getElementById('state').options[document.getElementById('state').selectedIndex].value
+        var state = document.getElementById('state').options[document.getElementById('state').selectedIndex].value
         widget.setPreferenceForKey(state, widget.identifier + '-selectedState');
     }
     
-    name = document.getElementById('city').value;
+    var name = document.getElementById('city').value;
     widget.setPreferenceForKey(name, widget.identifier + '-selectedName');
     
-    twilightZenith = document.getElementById('twilight').value;
+    var twilightZenith = document.getElementById('twilight').value;
     widget.setPreferenceForKey(twilightZenith, widget.identifier + '-twilightZenith');
     
     
@@ -1019,7 +1044,7 @@ function PerformLookup(executeNow)
         || gSavedSettings.state != document.getElementById('state').value
         || gSavedSettings.city != document.getElementById('city').value)
     {
-        countryName = countryMenu.options[countryMenu.selectedIndex].text;
+        var countryName = countryMenu.options[countryMenu.selectedIndex].text;
         state = document.getElementById('state').value;
         PerformLookupWith(name, state, countryName, country, executeNow);
     }
@@ -1037,8 +1062,8 @@ function FlipToFront(discardChanges)
     
     // Flip over.
     
-    front = document.getElementById("front");
-    back  = document.getElementById("back");
+    var front = document.getElementById("front");
+    var back  = document.getElementById("back");
     
     widget.prepareForTransition("ToFront");
     
@@ -1073,8 +1098,8 @@ function ToggleClockOnly()
     if (gClockOnly)
     {
         document.getElementById('tableWrapper').style.display = 'none';
-        target = 149;
-        increment = -15;
+        var target = 149;
+        var increment = -15;
     }
     else
     {
@@ -1223,7 +1248,6 @@ function WidgetDidLoad()
     }
     
     SetText('placeName', gPlaceName);
-    gTimeOffset = window.TimeZoneHelper.timeOffsetHours();
     
     if (myCity && myRegion)
     {
@@ -1238,17 +1262,17 @@ function WidgetDidLoad()
         CountryDidChange();
         if (myState) document.getElementById('state').value = myState;
         document.getElementById('city').value = myCity;
-        regionName = countryMenu.options[countryMenu.selectedIndex].text;
+        var regionName = countryMenu.options[countryMenu.selectedIndex].text;
         PerformLookupWith(myCity, myState, regionName, myRegion);
     }
     
     
     // Set displayed preferences.
     
-    selectedRegion = widget.preferenceForKey(widget.identifier + '-selectedRegion');
-    selectedState  = widget.preferenceForKey(widget.identifier + '-selectedState');
-    selectedCity   = widget.preferenceForKey(widget.identifier + '-selectedName');
-    twilightZenith = widget.preferenceForKey(widget.identifier + '-twilightZenith');
+    var selectedRegion = widget.preferenceForKey(widget.identifier + '-selectedRegion');
+    var selectedState  = widget.preferenceForKey(widget.identifier + '-selectedState');
+    var selectedCity   = widget.preferenceForKey(widget.identifier + '-selectedName');
+    var twilightZenith = widget.preferenceForKey(widget.identifier + '-twilightZenith');
     
     if (selectedRegion)
     {

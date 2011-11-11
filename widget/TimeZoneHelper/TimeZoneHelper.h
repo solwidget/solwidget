@@ -49,8 +49,7 @@
 - (NSArray *)allTimeZones;
 
 - (void)setTimeZoneWithName:(NSString *)name;
-- (double)timeOffsetHours;
-- (double)timeOffsetHoursForDate:(double)dateMillis;
+- (double)timeOffsetMillisForDate:(double)dateMillis;
 - (NSString *)formattedTimeForDate:(double)dateMillis;
 - (NSString *)lookupPlaceInRegion:(NSString *)region withName:(NSString *)name;
 

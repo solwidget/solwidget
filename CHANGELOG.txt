@@ -4,6 +4,8 @@
 - Fix issue #1: Map lookup now only uses validated names
 - Fix issue #6: Chartres, France uses incorrect location
 - Fix issue #8: Sol displays sunrise and sunset as â€
+- Fix issue #9: Times can be off by one hour on the day of a daylight savings time change
+- Times are now always displayed correctly in the time zone of the selected location
 - A few score more database corrections and updates
 - Better looking About page
 - Improved the external map lookup URL
