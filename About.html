@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
 Sol Widget About.html Page
-Copyright (C) 2010 Kyle J. McKay
+Copyright (C) 2010,2011 Kyle J. McKay
 Portions Copyright (C) 2006 Daniel S. Neumeyer
 All rights reserved
 
@@ -34,10 +34,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <title>About Sol</title>
 <style type="text/css">
 body {
+  color: black;
+  background-color: white;
   margin: 1em 0;
   min-width: 1024px;
   font-family: Times, Times New Roman, serif;
   font-size: 12pt;
+}
+a:link {
+  color: blue;
+}
+a:visited {
+  color: navy;
+}
+a:active {
+  color: red;
 }
 * {
   word-wrap: break-word;
@@ -50,7 +61,6 @@ pre {
   position: relative;
   width: 640px;
   margin: 0 auto 0 auto;
-  /*border: thin solid red;*/
   text-align: justify;
 }
 #screenshot {
@@ -96,13 +106,14 @@ pre {
   display: inline-block;
   font-size: 60%;
 }
-b,h1,h2,h3,h4,h5,h6,.summary,#appleRequiredText,#copyright {
+h1,h2,h3,h4,h5,h6,.summary,#appleRequiredText,#copyright {
   font-family: Helvetica, Arial, sans-serif;
+  font-weight: normal;
 }
 h1,h2,h3,h4,h5,h6 {
   border-bottom: thin solid gray;
 }
-h1 {
+div#content > h1 {
   /* Part of workaround for Opera bug */
   margin-top: 0;
 
@@ -119,24 +130,33 @@ h1 {
   display: float;
   position: absolute;
   left: -192px;
-  text-align: left;
+  text-align: right;
   width: 160px;
-  background-color: #eef;
-  border: thin solid gray;
   font-size: 75%;
   margin: 0;
   padding: 2px;
-  border-radius: 4px;
-  /* for firefox */
-  -moz-border-radius: 4px;
+}
+.sidebar a:visited, .sidebar a:link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: thin dotted gray;
+}
+.sidebar a:active {
+  color: red;
 }
 .license {
   display: block;
-  border: thin solid gray;
   text-align: left;
   font-size: 80%;
   margin: 10px 20px 10px 20px;
   background-color: #eee;
+  padding: 0.5em 0.5ex 0.5em 1ex;
+}
+.license a:link, .license a:visited {
+  color: inherit;
+}
+.license a:active {
+  color: red;
 }
 .summary {
   display: block;
@@ -145,9 +165,18 @@ h1 {
   color: gray;
   text-transform: uppercase;
 }
+.super, .fakesuper > span > span {
+  font-size: 75%;
+}
 .super {
   vertical-align: super;
-  font-size: 75%;
+}
+.fakesuper {
+  position: absolute;
+}
+.fakesuper > span {
+  position: relative;
+  top: -0.4em;
 }
 a img {
   /* For firefox */
@@ -170,8 +199,13 @@ function HideDK()
 <body onload="Loaded()">
 <div id="content">
 
+<h1 id="About">Sol 1.3.2</h1>
+<span class="summary">Sunrise and Sunset Dashboard Widget</span>
+
+<p>
+
 <span id="TOC" class="sidebar">
-<b>Table of Contents</b><br /><span>
+<i>Table of Contents</i><br /><span>
 <a href="#About"       >About</a><br />
 <a href="#Download"    >Download</a><br />
 <a href="#History"     >History</a><br />
@@ -182,9 +216,8 @@ function HideDK()
 <a href="#License"     >License</a><br />
 </span></span>
 
-<h1 id="About">Sol 1.3.1</h1>
-<span class="summary">Sunrise and Sunset Dashboard Widget</span>
-<p>Sol is a Dashboard widget that tells you what time sunrise and sunset are, as well as dawn and dusk.</p>
+Sol is a Dashboard widget that tells you what time sunrise and sunset are, as well as dawn and dusk.</p>
+
 <div id="screen">
 <img id="deletekeep" src="delete_keep_background.png" width="362" height="283" />
 <img id="wdgt" src="widget.png" width="272" height="163" />
@@ -193,25 +226,27 @@ function HideDK()
 <p>The analog display is a 24-hour clock, with noon at the top and midnight at the bottom. The dark region is nighttime, the light part is daytime, and the slivers in between are dawn and dusk. (Or, for the technically inclined, they are <a href="http://en.wikipedia.org/wiki/Civil_twilight">civil twilight</a>.)</p>
 
 <h2 id="Download">Download</h2>
+<p>This version of Sol can be downloaded from:</p>
 <div style="text-align:center">
-<a href="http://solwidget.googlecode.com/files/Sol-1.3.1.wdgt.zip"><img src="Icon.png" width="75" height="75" /></a><br />
-<a href="http://solwidget.googlecode.com/files/Sol-1.3.1.wdgt.zip">Sol-1.3.1.wdgt.zip</a><span style="position:absolute"><span class="super" style="position:relative; top:-0.25em"><a href="#appleRequiredText">&#x2055;</a></span></span>
+<a href="http://solwidget.googlecode.com/files/Sol-1.3.2.wdgt.zip"><img src="Icon.png" width="75" height="75" /></a><br />
+<a href="http://solwidget.googlecode.com/files/Sol-1.3.2.wdgt.zip">Sol-1.3.2.wdgt.zip</a><span class="fakesuper"><span><span><a href="#appleRequiredText">&#x2055;</a></span></span></span>
 </div>
+<p style="margin-top:0.5em">The most current version of Sol can always be found on <a href="http://code.google.com/p/solwidget/downloads">the Sol widget project’s downloads page</a>.</p>
 
 <h2 id="History">History</h2>
 
 <span class="sidebar">
-<b>Change History</b><br />
+<i>Change History</i><br />
 The change history of Sol can be viewed <a href="CHANGELOG.txt" target="_blank">here</a>.
 </span>
 
-<p>Originally created by Dan Neumeyer and initially released in 2006, the Sol widget was made available for download from Dan's web site and listed on the <a href="http://www.apple.com/downloads/dashboard/">Apple Dashboard Widgets</a> directory.
+<p>Originally created by Dan Neumeyer and initially released in 2006, the Sol widget was made available for download from Dan&#x2019;s web site and listed on the <a href="http://www.apple.com/downloads/dashboard/">Apple Dashboard Widgets</a> directory.
 </p>
 
-<p>Sometime in the second half of 2008 Dan's original website for Sol, <span class="link">http://captaindan.org/sw/Sol/</span>, disappeared.
+<p>Sometime in the second half of 2008 Dan&#x2019;s original website for Sol, <span class="link">http://captaindan.org/sw/Sol/</span>, disappeared.
 
 <span class="sidebar">
-<b>The Internet Archive</b><br />
+<i>The Internet Archive</i><br />
 The <a href="http://www.archive.org/about/about.php">Internet Archive</a> includes historical copies of web pages in its collection.
 </span>
 
@@ -219,33 +254,40 @@ The last available archive of the original Sol website can be viewed in the
 Internet Archive at <a href="http://web.archive.org/web/20080609234037/http://captaindan.org/sw/Sol/"><span class="link">http://web.archive.org/web/20080609234037/http://captaindan.org/sw/Sol/</span></a>.
 </p>
 
-<p>When Dan's website went away, that pretty much ended distribution of the Sol widget since the Apple's Dashboard Widgets directory does not actually contain any copies of the widgets in the directory, it merely redirects you to the original web site to download the widget.
+<p>When Dan&#x2019;s website went away, that pretty much ended distribution of the Sol widget since the Apple&#x2019;s Dashboard Widgets directory does not actually contain any copies of the widgets in the directory, it merely redirects you to the original web site to download the widget.
 </p>
 
-<p>Despite the loss of Dan's website, it was still possible to use the Sol widget if you had already installed it.  Unfortunately, since the Sol widget did city lookups by talking to a server running on Dan's website, it also became impossible to change the city at this time as well.
+<p>Despite the loss of Dan&#x2019;s website, it was still possible to use the Sol widget if you had already installed it.  Unfortunately, since the Sol widget did city lookups by talking to a server running on Dan&#x2019;s website, it also became impossible to change the city at this time as well.
 </p>
 
 <p>And, for the final nail in the coffin, Snow Leopard (10.6) was released in the second half of 2009.  Because the Sol widget contains some helper code that was never compiled as 64-bit (required for Snow Leopard widgets running on 64-bit processors), the helper portion of the widget would not operate under Snow Leopard on 64-bit processors.
 
 <h2 id="Rebirth">Rebirth</h2>
 
-<p>During the PST to PDT time change in early 2008, I noticed what appeared to be a bug in the time display for Sol where it did not seem to update to displaying PDT time until the day after the time change.  So I emailed Dan on 2009-03-09 and asked him if he might be willing to share the source code since his website indicated "Captain Dan has retired."  As a result, Dan was kind enough to release the sources on 2009-03-12 and let me know about it whereupon I immediately downloaded and saved a copy of the sources.
+<p>During the PST to PDT time change in early 2008, I noticed what appeared to be a bug
+
+<span class="sidebar">
+<i>The DST Bug</i><br />
+<a href="http://code.google.com/p/solwidget/issues/detail?id=9">The bug</a> was finally fixed in Sol version 1.3.2.  It turned out to be a more general problem with the way the JavaScript code handled the time zone of the selected location.
+</span>
+
+in the time display for Sol where it did not seem to update to displaying PDT time until the day after the time change.  So I emailed Dan on 2008-03-09 and asked him if he might be willing to share the source code since his website indicated &#x201c;Captain Dan has retired.&#x201d;  As a result, Dan was kind enough to release the sources on 2008-03-12 and let me know about it whereupon I immediately downloaded and saved a copy of the sources.
 </p>
 
 <p>The Sol source code which I had downloaded and intended to play with just sat and sat on my hard disk completely ignored but safely tucked away.
 </p>
 
-<p>Fast forward to late August 2010 when I'm helping my neighbor with a new iMac.  I offered to install the Sol widget for him and couldn't find it on the Apple Dashboard Widgets directory.  Thinking that was no problem since I had a copy, I installed it using my copy.  Then I discovered that it wasn't possible to change the city.  And while the widget continued to display Cupertino's sunrise and sunset times just fine, that was not particularly helpful since I don't happen to live in Cupertino.
+<p>Fast forward to late August 2010 when I&#x2019;m helping my neighbor with a new iMac.  I offered to install the Sol widget for him and couldn&#x2019;t find it on the Apple Dashboard Widgets directory.  Thinking that was no problem since I had a copy, I installed it using my copy.  Then I discovered that it wasn&#x2019;t possible to change the city.  And while the widget continued to display Cupertino&#x2019;s sunrise and sunset times just fine, that was not particularly helpful since I don&#x2019;t happen to live in Cupertino.
 
 <span class="sidebar">
-<b>It Works For Me!</b><br />
-Turns out since I was still running Leopard, the helper code continued to work for me and since I hadn't tried to change the city since I had originally installed the Sol widget I hadn't noticed Dan's website (which performed the city-to-latitude/longitude lookups) had gone away either.
+<i>It Works For Me!</i><br />
+Turns out since I was still running Leopard, the helper code continued to work for me and since I hadn&#x2019;t tried to change the city since I had originally installed the Sol widget I hadn&#x2019;t noticed Dan&#x2019;s website (which performed the city-to-latitude/longitude lookups) had gone away either.
 </span>
 
 This was all the more surprising to me because I still had several copies of the widget installed on my machine and they were displaying times just fine (and none of them for Cupertino either).
 </p>
 
-<p>So at this point I started digging into the Sol source code that I had stored away two years ago and began the process of figuring out why it wasn't working anymore.
+<p>So at this point I started digging into the Sol source code that I had stored away two years ago and began the process of figuring out why it wasn&#x2019;t working anymore.
 
 <h2 id="Database">The Places Database</h2>
 
@@ -253,11 +295,11 @@ This was all the more surprising to me because I still had several copies of the
 </p>
 
 <span class="sidebar">
-<b>Mangled Characters</b><br />
+<i>Mangled Characters</i><br />
 Start with place names some of which are encoded using <a href="http://en.wikipedia.org/wiki/Windows-1252" target="_blank">windows-1252</a> and the rest using <a href="http://en.wikipedia.org/wiki/Utf-8" target="_blank">UTF-8</a>.  Now treat all of them (including the ones that are already in UTF-8) as though they are encoded in windows-1252 and convert to UTF-8.  That is the mangled mess I found the original database dump in.
 </span>
 
-<p>Before I could even look at the database, the SQL dump had to be cleaned up.  It was a MySQL dump that wasn't particularly helpful and furthermore the non-ASCII characters (i.e. accented characters) were unrecognizable.
+<p>Before I could even look at the database, the SQL dump had to be cleaned up.  It was a MySQL dump that wasn&#x2019;t particularly helpful and furthermore the non-ASCII characters (i.e. accented characters) were unrecognizable.
 </p>
 
 <p>After some work, I produced a cleaned up version of the database dump that was strictly UTF-8 and could be imported into an <a href="http://www.sqlite.org/" target="_blank">SQLite</a> database to examine.
@@ -270,8 +312,8 @@ Start with place names some of which are encoded using <a href="http://en.wikipe
 </p>
 
 <span class="sidebar">
-<b>Lookup Speed</b><br />
-It turns out it's possible to shave about another 3 megabytes off the database size at the cost of quadrupling lookup times.  On older macs lookups would then take almost 8 seconds which seems totally unacceptable.
+<i>Lookup Speed</i><br />
+It turns out it&#x2019;s possible to shave about another 3 megabytes off the database size at the cost of quadrupling lookup times.  On older macs lookups would then take almost 8 seconds which seems totally unacceptable.
 </span>
 
 <p>While I would like to make the database even smaller, that does not seem likely to happen anytime soon.  Since I intend for the new version of the Sol widget to remain completely standalone (i.e. no network connection is needed to change cities or display sunrise/sunset information) the total downloadable size of the Sol widget will remain around 20 megabytes for the foreseeable future (the actual widget and helper code only add a fraction of a megabyte to the compressed Sol.wdgt.zip download file).
@@ -283,15 +325,15 @@ It turns out it's possible to shave about another 3 megabytes off the database s
 
 <h2 id="Requirements">System Requirements</h2>
 
-<p>The current version of the Sol widget is compatible with Mac OS X 10.4.3 and later including both PPC and Intel processors and Snow Leopard 10.6.x (including 64-bit processors) and is distributed in a single Universal Binary format that works on all supported systems.
+<p>The current version of the Sol widget is compatible with Mac OS X 10.4.3 and later including both PPC and Intel processors (including 64-bit processors) and Snow Leopard 10.6.x and Tiger 10.7.x and is distributed in a single Universal Binary format that works on all supported systems.
 
 <h2 id="License">License</h2>
 
 <p>The new code that has been added to create, read and write the special, compact format places database is licensed under the GPLv3.  Because the resulting Sol.wdgt is considered a combined work the Sol widget as a whole now falls under the GPLv3 license (see the <a href="LICENSE.txt" target="_blank">LICENSE.txt</a> file for further details).
 
 <span class="sidebar">
-<b>Sol 1.2.3 License</b><br />
-The Sol 1.2.3 License is also available in the <a href="OLDLICENSE.txt" target="_blank">OLDLICENSE.txt</a> file.  Note that while the archived copy of Dan's web site, his email to me and the README in the original Sol 1.2.3 source distribution mentions the MIT license, the text of the LICENSE file included in the Sol 1.2.3 sources distribution (and duplicated here and in the OLDLICENSE.txt file) actually matches <a href="http://www.gnu.org/licenses/license-list.html#ModifiedBSD" target="_blank">the modified BSD (aka 3-clause BSD) license</a> not the <a href="http://www.gnu.org/licenses/license-list.html#X11License" target="_blank">MIT/X11 license</a>.
+<i>Sol 1.2.3 License</i><br />
+The Sol 1.2.3 License is also available in the <a href="OLDLICENSE.txt" target="_blank">OLDLICENSE.txt</a> file.  Note that while the archived copy of Dan&#x2019;s web site, his email to me and the README in the original Sol 1.2.3 source distribution mentions the MIT license, the text of the LICENSE file included in the Sol 1.2.3 sources distribution (and duplicated here and in the OLDLICENSE.txt file) actually matches <a href="http://www.gnu.org/licenses/license-list.html#ModifiedBSD" target="_blank">the modified BSD (aka 3-clause BSD) license</a> not the <a href="http://www.gnu.org/licenses/license-list.html#X11License" target="_blank">MIT/X11 license</a>.
 </span>
 
 <p>The original Sol 1.2.3 source code is licensed under the following license:</p>
@@ -313,7 +355,7 @@ modification, are permitted provided that the following conditions are met:
     derived from this software without specific prior written permission.</li>
 </ul>
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &#x201c;AS IS&#x201d; AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
@@ -328,7 +370,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <p>The code that has been added to create, read and write the special format, compact database is licensed under the
 
 <span class="sidebar">
-<b>GNU General Public License Version 3</b><br />
+<i>GNU General Public License Version 3</i><br />
 The GPLv3 is also available in the <a href="COPYING.txt" target="_blank">COPYING.txt</a> file.
 </span>
 
@@ -379,16 +421,16 @@ know their rights.</p>
 (1) assert copyright on the software, and (2) offer you this License
 giving you legal permission to copy, distribute and/or modify it.</p>
 
-<p>For the developers' and authors' protection, the GPL clearly explains
-that there is no warranty for this free software.  For both users' and
-authors' sake, the GPL requires that modified versions be marked as
+<p>For the developers&#x2019; and authors&#x2019; protection, the GPL clearly explains
+that there is no warranty for this free software.  For both users&#x2019; and
+authors&#x2019; sake, the GPL requires that modified versions be marked as
 changed, so that their problems will not be attributed erroneously to
 authors of previous versions.</p>
 
 <p>Some devices are designed to deny users access to install or run
 modified versions of the software inside them, although the manufacturer
 can do so.  This is fundamentally incompatible with the aim of
-protecting users' freedom to change the software.  The systematic
+protecting users&#x2019; freedom to change the software.  The systematic
 pattern of such abuse occurs in the area of products for individuals to
 use, which is precisely where it is most unacceptable.  Therefore, we
 have designed this version of the GPL to prohibit the practice for those
@@ -410,35 +452,35 @@ modification follow.</p>
 
 <h4><a name="section0"></a>0. Definitions.</h4>
 
-<p>&ldquo;This License&rdquo; refers to version 3 of the GNU General Public License.</p>
+<p>&#x201c;This License&#x201d; refers to version 3 of the GNU General Public License.</p>
 
-<p>&ldquo;Copyright&rdquo; also means copyright-like laws that apply to other kinds of
+<p>&#x201c;Copyright&#x201d; also means copyright-like laws that apply to other kinds of
 works, such as semiconductor masks.</p>
  
-<p>&ldquo;The Program&rdquo; refers to any copyrightable work licensed under this
-License.  Each licensee is addressed as &ldquo;you&rdquo;.  &ldquo;Licensees&rdquo; and
-&ldquo;recipients&rdquo; may be individuals or organizations.</p>
+<p>&#x201c;The Program&#x201d; refers to any copyrightable work licensed under this
+License.  Each licensee is addressed as &#x201c;you&#x201d;.  &#x201c;Licensees&#x201d; and
+&#x201c;recipients&#x201d; may be individuals or organizations.</p>
 
-<p>To &ldquo;modify&rdquo; a work means to copy from or adapt all or part of the work
+<p>To &#x201c;modify&#x201d; a work means to copy from or adapt all or part of the work
 in a fashion requiring copyright permission, other than the making of an
-exact copy.  The resulting work is called a &ldquo;modified version&rdquo; of the
-earlier work or a work &ldquo;based on&rdquo; the earlier work.</p>
+exact copy.  The resulting work is called a &#x201c;modified version&#x201d; of the
+earlier work or a work &#x201c;based on&#x201d; the earlier work.</p>
 
-<p>A &ldquo;covered work&rdquo; means either the unmodified Program or a work based
+<p>A &#x201c;covered work&#x201d; means either the unmodified Program or a work based
 on the Program.</p>
 
-<p>To &ldquo;propagate&rdquo; a work means to do anything with it that, without
+<p>To &#x201c;propagate&#x201d; a work means to do anything with it that, without
 permission, would make you directly or secondarily liable for
 infringement under applicable copyright law, except executing it on a
 computer or modifying a private copy.  Propagation includes copying,
 distribution (with or without modification), making available to the
 public, and in some countries other activities as well.</p>
 
-<p>To &ldquo;convey&rdquo; a work means any kind of propagation that enables other
+<p>To &#x201c;convey&#x201d; a work means any kind of propagation that enables other
 parties to make or receive copies.  Mere interaction with a user through
 a computer network, with no transfer of a copy, is not conveying.</p>
 
-<p>An interactive user interface displays &ldquo;Appropriate Legal Notices&rdquo;
+<p>An interactive user interface displays &#x201c;Appropriate Legal Notices&#x201d;
 to the extent that it includes a convenient and prominently visible
 feature that (1) displays an appropriate copyright notice, and (2)
 tells the user that there is no warranty for the work (except to the
@@ -449,30 +491,30 @@ menu, a prominent item in the list meets this criterion.</p>
 
 <h4><a name="section1"></a>1. Source Code.</h4>
 
-<p>The &ldquo;source code&rdquo; for a work means the preferred form of the work
-for making modifications to it.  &ldquo;Object code&rdquo; means any non-source
+<p>The &#x201c;source code&#x201d; for a work means the preferred form of the work
+for making modifications to it.  &#x201c;Object code&#x201d; means any non-source
 form of a work.</p>
 
-<p>A &ldquo;Standard Interface&rdquo; means an interface that either is an official
+<p>A &#x201c;Standard Interface&#x201d; means an interface that either is an official
 standard defined by a recognized standards body, or, in the case of
 interfaces specified for a particular programming language, one that
 is widely used among developers working in that language.</p>
 
-<p>The &ldquo;System Libraries&rdquo; of an executable work include anything, other
+<p>The &#x201c;System Libraries&#x201d; of an executable work include anything, other
 than the work as a whole, that (a) is included in the normal form of
 packaging a Major Component, but which is not part of that Major
 Component, and (b) serves only to enable use of the work with that
 Major Component, or to implement a Standard Interface for which an
 implementation is available to the public in source code form.  A
-&ldquo;Major Component&rdquo;, in this context, means a major essential component
+&#x201c;Major Component&#x201d;, in this context, means a major essential component
 (kernel, window system, and so on) of the specific operating system
 (if any) on which the executable work runs, or a compiler used to
 produce the work, or an object code interpreter used to run it.</p>
 
-<p>The &ldquo;Corresponding Source&rdquo; for a work in object code form means all
+<p>The &#x201c;Corresponding Source&#x201d; for a work in object code form means all
 the source code needed to generate, install, and (for an executable
 work) run the object code and to modify the work, including scripts to
-control those activities.  However, it does not include the work's
+control those activities.  However, it does not include the work&#x2019;s
 System Libraries, or general-purpose tools or generally available free
 programs which are used unmodified in performing those activities but
 which are not part of the work.  For example, Corresponding Source
@@ -514,7 +556,7 @@ your copyrighted material outside their relationship with you.</p>
 the conditions stated below.  Sublicensing is not allowed; section 10
 makes it unnecessary.</p>
 
-<h4><a name="section3"></a>3. Protecting Users' Legal Rights From Anti-Circumvention Law.</h4>
+<h4><a name="section3"></a>3. Protecting Users&#x2019; Legal Rights From Anti-Circumvention Law.</h4>
 
 <p>No covered work shall be deemed part of an effective technological
 measure under any applicable law fulfilling obligations under article
@@ -526,13 +568,13 @@ measures.</p>
 circumvention of technological measures to the extent such circumvention
 is effected by exercising rights under this License with respect to
 the covered work, and you disclaim any intention to limit operation or
-modification of the work as a means of enforcing, against the work's
-users, your or third parties' legal rights to forbid circumvention of
+modification of the work as a means of enforcing, against the work&#x2019;s
+users, your or third parties&#x2019; legal rights to forbid circumvention of
 technological measures.</p>
 
 <h4><a name="section4"></a>4. Conveying Verbatim Copies.</h4>
 
-<p>You may convey verbatim copies of the Program's source code as you
+<p>You may convey verbatim copies of the Program&#x2019;s source code as you
 receive it, in any medium, provided that you conspicuously and
 appropriately publish on each copy an appropriate copyright notice;
 keep intact all notices stating that this License and any
@@ -556,7 +598,7 @@ terms of section 4, provided that you also meet all of these conditions:</p>
 <li>b) The work must carry prominent notices stating that it is
     released under this License and any conditions added under section
     7.  This requirement modifies the requirement in section 4 to
-    &ldquo;keep intact all notices&rdquo;.</li>
+    &#x201c;keep intact all notices&#x201d;.</li>
 
 <li>c) You must license the entire work, as a whole, under this
     License to anyone who comes into possession of a copy.  This
@@ -576,8 +618,8 @@ terms of section 4, provided that you also meet all of these conditions:</p>
 works, which are not by their nature extensions of the covered work,
 and which are not combined with it such as to form a larger program,
 in or on a volume of a storage or distribution medium, is called an
-&ldquo;aggregate&rdquo; if the compilation and its resulting copyright are not
-used to limit the access or legal rights of the compilation's users
+&#x201c;aggregate&#x201d; if the compilation and its resulting copyright are not
+used to limit the access or legal rights of the compilation&#x2019;s users
 beyond what the individual works permit.  Inclusion of a covered work
 in an aggregate does not cause this License to apply to the other
 parts of the aggregate.</p>
@@ -636,12 +678,12 @@ in one of these ways:</p>
 from the Corresponding Source as a System Library, need not be
 included in conveying the object code work.</p>
 
-<p>A &ldquo;User Product&rdquo; is either (1) a &ldquo;consumer product&rdquo;, which means any
+<p>A &#x201c;User Product&#x201d; is either (1) a &#x201c;consumer product&#x201d;, which means any
 tangible personal property which is normally used for personal, family,
 or household purposes, or (2) anything designed or sold for incorporation
 into a dwelling.  In determining whether a product is a consumer product,
 doubtful cases shall be resolved in favor of coverage.  For a particular
-product received by a particular user, &ldquo;normally used&rdquo; refers to a
+product received by a particular user, &#x201c;normally used&#x201d; refers to a
 typical or common use of that class of product, regardless of the status
 of the particular user or of the way in which the particular user
 actually uses, or expects or is expected to use, the product.  A product
@@ -649,7 +691,7 @@ is a consumer product regardless of whether the product has substantial
 commercial, industrial or non-consumer uses, unless such uses represent
 the only significant mode of use of the product.</p>
 
-<p>&ldquo;Installation Information&rdquo; for a User Product means any methods,
+<p>&#x201c;Installation Information&#x201d; for a User Product means any methods,
 procedures, authorization keys, or other information required to install
 and execute modified versions of a covered work in that User Product from
 a modified version of its Corresponding Source.  The information must
@@ -684,7 +726,7 @@ unpacking, reading or copying.</p>
 
 <h4><a name="section7"></a>7. Additional Terms.</h4>
 
-<p>&ldquo;Additional permissions&rdquo; are terms that supplement the terms of this
+<p>&#x201c;Additional permissions&#x201d; are terms that supplement the terms of this
 License by making exceptions from one or more of its conditions.
 Additional permissions that are applicable to the entire Program shall
 be treated as though they were included in this License, to the extent
@@ -729,8 +771,8 @@ that material) supplement the terms of this License with terms:</p>
     those licensors and authors.</li>
 </ul>
 
-<p>All other non-permissive additional terms are considered &ldquo;further
-restrictions&rdquo; within the meaning of section 10.  If the Program as you
+<p>All other non-permissive additional terms are considered &#x201c;further
+restrictions&#x201d; within the meaning of section 10.  If the Program as you
 received it, or any part of it, contains a notice stating that it is
 governed by this License along with a term that is a further
 restriction, you may remove that term.  If a license document contains
@@ -794,12 +836,12 @@ receives a license from the original licensors, to run, modify and
 propagate that work, subject to this License.  You are not responsible
 for enforcing compliance by third parties with this License.</p>
 
-<p>An &ldquo;entity transaction&rdquo; is a transaction transferring control of an
+<p>An &#x201c;entity transaction&#x201d; is a transaction transferring control of an
 organization, or substantially all assets of one, or subdividing an
 organization, or merging organizations.  If propagation of a covered
 work results from an entity transaction, each party to that
 transaction who receives a copy of the work also receives whatever
-licenses to the work the party's predecessor in interest had or could
+licenses to the work the party&#x2019;s predecessor in interest had or could
 give under the previous paragraph, plus a right to possession of the
 Corresponding Source of the work from the predecessor in interest, if
 the predecessor has it or can get it with reasonable efforts.</p>
@@ -814,29 +856,29 @@ sale, or importing the Program or any portion of it.</p>
 
 <h4><a name="section11"></a>11. Patents.</h4>
 
-<p>A &ldquo;contributor&rdquo; is a copyright holder who authorizes use under this
+<p>A &#x201c;contributor&#x201d; is a copyright holder who authorizes use under this
 License of the Program or a work on which the Program is based.  The
-work thus licensed is called the contributor's &ldquo;contributor version&rdquo;.</p>
+work thus licensed is called the contributor&#x2019;s &#x201c;contributor version&#x201d;.</p>
 
-<p>A contributor's &ldquo;essential patent claims&rdquo; are all patent claims
+<p>A contributor&#x2019;s &#x201c;essential patent claims&#x201d; are all patent claims
 owned or controlled by the contributor, whether already acquired or
 hereafter acquired, that would be infringed by some manner, permitted
 by this License, of making, using, or selling its contributor version,
 but do not include claims that would be infringed only as a
 consequence of further modification of the contributor version.  For
-purposes of this definition, &ldquo;control&rdquo; includes the right to grant
+purposes of this definition, &#x201c;control&#x201d; includes the right to grant
 patent sublicenses in a manner consistent with the requirements of
 this License.</p>
 
 <p>Each contributor grants you a non-exclusive, worldwide, royalty-free
-patent license under the contributor's essential patent claims, to
+patent license under the contributor&#x2019;s essential patent claims, to
 make, use, sell, offer for sale, import and otherwise run, modify and
 propagate the contents of its contributor version.</p>
 
-<p>In the following three paragraphs, a &ldquo;patent license&rdquo; is any express
+<p>In the following three paragraphs, a &#x201c;patent license&#x201d; is any express
 agreement or commitment, however denominated, not to enforce a patent
 (such as an express permission to practice a patent or covenant not to
-sue for patent infringement).  To &ldquo;grant&rdquo; such a patent license to a
+sue for patent infringement).  To &#x201c;grant&#x201d; such a patent license to a
 party means to make such an agreement or commitment not to enforce a
 patent against the party.</p>
 
@@ -848,9 +890,9 @@ then you must either (1) cause the Corresponding Source to be so
 available, or (2) arrange to deprive yourself of the benefit of the
 patent license for this particular work, or (3) arrange, in a manner
 consistent with the requirements of this License, to extend the patent
-license to downstream recipients.  &ldquo;Knowingly relying&rdquo; means you have
+license to downstream recipients.  &#x201c;Knowingly relying&#x201d; means you have
 actual knowledge that, but for the patent license, your conveying the
-covered work in a country, or your recipient's use of the covered work
+covered work in a country, or your recipient&#x2019;s use of the covered work
 in a country, would infringe one or more identifiable patents in that
 country that you have reason to believe are valid.</p>
   
@@ -862,7 +904,7 @@ or convey a specific copy of the covered work, then the patent license
 you grant is automatically extended to all recipients of the covered
 work and works based on it.</p>
 
-<p>A patent license is &ldquo;discriminatory&rdquo; if it does not include within
+<p>A patent license is &#x201c;discriminatory&#x201d; if it does not include within
 the scope of its coverage, prohibits the exercise of, or is
 conditioned on the non-exercise of one or more of the rights that are
 specifically granted under this License.  You may not convey a covered
@@ -881,7 +923,7 @@ or that patent license was granted, prior to 28 March 2007.</p>
 any implied license or other defenses to infringement that may
 otherwise be available to you under applicable patent law.</p>
 
-<h4><a name="section12"></a>12. No Surrender of Others' Freedom.</h4>
+<h4><a name="section12"></a>12. No Surrender of Others&#x2019; Freedom.</h4>
 
 <p>If conditions are imposed on you (whether by court order, agreement or
 otherwise) that contradict the conditions of this License, they do not
@@ -913,7 +955,7 @@ address new problems or concerns.</p>
 
 <p>Each version is given a distinguishing version number.  If the
 Program specifies that a certain numbered version of the GNU General
-Public License &ldquo;or any later version&rdquo; applies to it, you have the
+Public License &#x201c;or any later version&#x201d; applies to it, you have the
 option of following the terms and conditions either of that numbered
 version or of any later version published by the Free Software
 Foundation.  If the Program does not specify a version number of the
@@ -921,7 +963,7 @@ GNU General Public License, you may choose any version ever published
 by the Free Software Foundation.</p>
 
 <p>If the Program specifies that a proxy can decide which future
-versions of the GNU General Public License can be used, that proxy's
+versions of the GNU General Public License can be used, that proxy&#x2019;s
 public statement of acceptance of a version permanently authorizes you
 to choose that version for the Program.</p>
 
@@ -934,7 +976,7 @@ later version.</p>
 
 <p>THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
 APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
-HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM &ldquo;AS IS&rdquo; WITHOUT WARRANTY
+HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM &#x201c;AS IS&#x201d; WITHOUT WARRANTY
 OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
 THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
@@ -973,9 +1015,9 @@ free software which everyone can redistribute and change under these terms.</p>
 <p>To do so, attach the following notices to the program.  It is safest
 to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
-the &ldquo;copyright&rdquo; line and a pointer to where the full notice is found.</p>
+the &#x201c;copyright&#x201d; line and a pointer to where the full notice is found.</p>
 
-<pre>    &lt;one line to give the program's name and a brief idea of what it does.&gt;
+<pre>    &lt;one line to give the program&#x2019;s name and a brief idea of what it does.&gt;
     Copyright (C) &lt;year&gt;  &lt;name of author&gt;
 
     This program is free software: you can redistribute it and/or modify
@@ -998,17 +1040,17 @@ the &ldquo;copyright&rdquo; line and a pointer to where the full notice is found
 notice like this when it starts in an interactive mode:</p>
 
 <pre>    &lt;program&gt;  Copyright (C) &lt;year&gt;  &lt;name of author&gt;
-    This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+    This program comes with ABSOLUTELY NO WARRANTY; for details type &#x2018;show w&#x2019;.
     This is free software, and you are welcome to redistribute it
-    under certain conditions; type `show c' for details.
+    under certain conditions; type &#x2018;show c&#x2019; for details.
 </pre>
 
-<p>The hypothetical commands `show w' and `show c' should show the appropriate
-parts of the General Public License.  Of course, your program's commands
-might be different; for a GUI interface, you would use an &ldquo;about box&rdquo;.</p>
+<p>The hypothetical commands &#x2018;show w&#x2019; and &#x2018;show c&#x2019; should show the appropriate
+parts of the General Public License.  Of course, your program&#x2019;s commands
+might be different; for a GUI interface, you would use an &#x201c;about box&#x201d;.</p>
 
 <p>You should also get your employer (if you work as a programmer) or school,
-if any, to sign a &ldquo;copyright disclaimer&rdquo; for the program, if necessary.
+if any, to sign a &#x201c;copyright disclaimer&#x201d; for the program, if necessary.
 For more information on this, and how to apply and follow the GNU GPL, see
 &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
 
@@ -1020,10 +1062,10 @@ Public License instead of this License.  But first, please read
 &lt;<a href="http://www.gnu.org/philosophy/why-not-lgpl.html">http://www.gnu.org/philosophy/why-not-lgpl.html</a>&gt;.</p>
 </span>
 
-<div id="appleRequiredText"><span class="super">&#x2055;</span>Mac OS X 10.4 Tiger is required. If you're using Safari, click the download link. When the widget download is complete, show Dashboard, click the Plus sign to display the Widget Bar and click the widget's icon in the Widget Bar to open it. If you're using a browser other than Safari, click the download link. When the widget download is complete, unarchive it and place it in /Library/Widgets/ in your home folder, show Dashboard, click the Plus sign to display the Widget Bar and click the widget's icon in the Widget Bar to open it.</div>
+<div id="appleRequiredText"><span class="super">&#x2055;</span>Mac OS X 10.4 Tiger is required. If you&#x2019;re using Safari, click the download link. When the widget download is complete, show Dashboard, click the Plus sign to display the Widget Bar and click the widget&#x2019;s icon in the Widget Bar to open it. If you&#x2019;re using a browser other than Safari, click the download link. When the widget download is complete, unarchive it and place it in /Library/Widgets/ in your home folder, show Dashboard, click the Plus sign to display the Widget Bar and click the widget&#x2019;s icon in the Widget Bar to open it.</div>
 
 <div id="contact"><img src="contact.png" alt="" title="" /></div>
-<div id="copyright"><span>Copyright &#169; 2010 Kyle J. McKay.  Portions Copyright &#169; 2006 Daniel S. Neumeyer.  All rights reserved.</span></div>
+<div id="copyright"><span>Copyright &#169; 2010,2011 Kyle J. McKay.  Portions Copyright &#169; 2006 Daniel S. Neumeyer.  All rights reserved.</span></div>
 </div>
 </body>
 </html>

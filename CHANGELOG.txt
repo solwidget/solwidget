@@ -1,4 +1,17 @@
-﻿1.3.1 (Changes since 1.3.0b2) 2010-09-12
+﻿1.3.2 (Changes since 1.3.1) 2011-11-11
+
+- Try harder to find an initial location before falling back to Cupertino
+- Fix issue #1: Map lookup now only uses validated names
+- Fix issue #6: Chartres, France uses incorrect location
+- Fix issue #8: Sol displays sunrise and sunset as â€
+- Fix issue #9: Times can be off by one hour on the day of a daylight savings time change
+- Times are now always displayed correctly in the time zone of the selected location
+- A few score more database corrections and updates
+- Better looking About page
+- Improved the external map lookup URL
+
+
+1.3.1 (Changes since 1.3.0b2) 2010-09-12
 
 - Be more conservative about returning alternate names in the results (London is no longer forced to City of Westminster)
 - Back of widget now has map icon to show location on map
@@ -24,7 +37,7 @@
 - Development restarted with new developer
 - Works on Snow Leopard
 - Esc, Return, Enter work on back side
-- Back side controls no longer drag widget (which means text in city box is no mouse-selectable)
+- Back side controls no longer drag widget (which means text in city box is now mouse-selectable)
 - Places database now included with widget -- no server required anymore!
 - City lookups improved
 - Places database dump cleaned up to be usable (was in mangled character set)
