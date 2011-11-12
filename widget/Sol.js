@@ -34,7 +34,7 @@
 
 // Version number. If you change this, also change Info.plist.
 
-var gVersion = '1.3.2';
+var gVersion = '1.3.3';
 
 
 // Last lookup (not validated)
