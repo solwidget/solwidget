@@ -26,5 +26,5 @@ localizedStrings['Done']         = 'Fertig';
 
 function LocaleInit()
 {
-	window.resizeBy(49, 0);
+    window.resizeBy(49, 0);
 }

@@ -1,4 +1,4 @@
-/* This adds 30 pixels to all widths. */
+/* This adds 30 pixels to all front widths, 20 to the back. */
 
 #front
 {
@@ -17,7 +17,7 @@
 
 #back
 {
-	width: 254px;
+	width: 244px;
 }
 
 #tableWrapper

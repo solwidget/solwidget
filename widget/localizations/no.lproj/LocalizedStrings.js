@@ -22,3 +22,9 @@ localizedStrings['Astronomical'] = 'Astronomisk';
 localizedStrings['by']           = 'av';
 localizedStrings['About']        = 'Om';
 localizedStrings['Done']         = 'Ferdig';
+
+
+function LocaleInit()
+{
+    gBackSizeAdjust = 20;
+}

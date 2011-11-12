@@ -26,5 +26,6 @@ localizedStrings['Done']         = 'Klaar';
 
 function LocaleInit()
 {
-	window.resizeBy(30, 0);
+    window.resizeBy(30, 0);
+    gBackSizeAdjust = -10;
 }

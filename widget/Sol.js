@@ -65,6 +65,7 @@ var gWhiteInfoButton;
 
 var gClockOnly;
 var gExpandedWidth;
+var gBackSizeAdjust;
 
 
 // Timer for periodic updates.
@@ -955,7 +956,11 @@ function FlipToBack()
     if (gClockOnly)
     {
         document.getElementById('infoButton').style.display = 'none';
-        window.resizeTo(gExpandedWidth, window.innerHeight);
+        window.resizeTo(gExpandedWidth + gBackSizeAdjust, window.innerHeight);
+    }
+    else if (gBackSizeAdjust)
+    {
+        window.resizeTo(gExpandedWidth + gBackSizeAdjust, window.innerHeight);
     }
 
     widget.prepareForTransition("ToBack");
@@ -1070,8 +1075,12 @@ function FlipToFront(discardChanges)
     back.style.display = "none";
     front.style.display = "block";
     
+    if (gClockOnly)
+        window.resizeTo(149, window.innerHeight);
+    else if (gBackSizeAdjust)
+        window.resizeTo(gExpandedWidth, window.innerHeight);
+
     setTimeout("widget.performTransition(); WidgetDidShow();", 0);
-    if (gClockOnly) window.resizeTo(149, window.innerHeight);
 }
 
 
@@ -1151,6 +1160,7 @@ function WidgetDidLoad()
     // Do any locale-specific initialization that might need to be performed.
     // (In particular, the German and Dutch localizations need to widen the window.)
     
+    gBackSizeAdjust = 0;
     if (window.LocaleInit) LocaleInit();
     gExpandedWidth = window.innerWidth;
     
