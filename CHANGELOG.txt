@@ -1,4 +1,10 @@
 ﻿
+1.3.4 (Changes since 1.3.3) 2013-??-??
+
+- Add ReadMe.rtf
+- Fix incorrect twilight display at extreme latitudes
+
+
 1.3.3 (Changes since 1.3.2) 2011-11-11
 
 - Spanish localization added courtesy of Javier Tamames

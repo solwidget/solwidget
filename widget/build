@@ -85,5 +85,9 @@ cat ../service/database.gz > Sol.wdgt/TimeZoneHelper.bundle/Contents/Resources/d
 stamp="`TZ=Z date +%Y%m%d`0000"
 find Sol.wdgt -print0 | TZ=Z xargs -0 touch -t "$stamp"
 rm -f Sol.wdgt$suffix.zip
-zip -X -9 -r Sol.wdgt$suffix.zip Sol.wdgt
+rm -rf Sol
+mkdir Sol
+ln -s ../Sol.wdgt Sol/
+ln -s ../ReadMe.rtf Sol/
+zip -X -9 -r Sol.wdgt$suffix.zip Sol
 TZ=Z touch -t "$stamp" Sol.wdgt$suffix.zip
