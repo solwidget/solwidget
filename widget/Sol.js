@@ -655,24 +655,22 @@ function Redraw()
     {
         SetText('sunriseCell', '—');
         SetText('sunsetCell', '—');
-        
-        if (morningTwilight && eveningTwilight)
-        {
-            SetText('morningTwilightCell', TimeString(morningTwilight));
-            SetText('eveningTwilightCell', TimeString(eveningTwilight));
-        }
-        else
-        {
-            SetText('morningTwilightCell', '—');
-            SetText('eveningTwilightCell', '—');
-        }
     }
     else
     {
-        SetText('morningTwilightCell', TimeString(morningTwilight));
         SetText('sunriseCell',         TimeString(sunrise));
         SetText('sunsetCell',          TimeString(sunset));
+    }
+
+    if (morningTwilight && eveningTwilight)
+    {
+        SetText('morningTwilightCell', TimeString(morningTwilight));
         SetText('eveningTwilightCell', TimeString(eveningTwilight));
+    }
+    else
+    {
+        SetText('morningTwilightCell', '—');
+        SetText('eveningTwilightCell', '—');
     }
     
     
