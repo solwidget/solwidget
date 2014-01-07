@@ -3,7 +3,7 @@
 //  Logic for Sol
 //
 //  Copyright (C) 2006 Daniel S. Neumeyer
-//  Portions Copyright (C) 2010,2011 Kyle J. McKay
+//  Portions Copyright (C) 2010,2011,2014 Kyle J. McKay
 //  All Rights Reserved
 //
 //
@@ -90,6 +90,25 @@ gClockHandShadow.src = 'ClockHandShadow.png';
 // Save settings for ESCape
 
 var gSavedSettings = {}
+
+
+// -- message --
+//
+// Output message to the log, either system log or console log
+function message(s)
+{
+    try {
+        if (window.widget) {
+            // Running in Dashboard, must use window.alert
+            window.alert(s);
+        }
+        else {
+            // Not running in Dashboard, send to console
+            window.console.log(s)
+        }
+    }
+    finally {}
+}
 
 
 // -- CountryDidChange --
