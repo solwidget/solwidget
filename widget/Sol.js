@@ -599,9 +599,22 @@ function TimeString(hours)
 //
 // Handles the onshow event for the widget. Redraws and starts periodic updates.
 //
+var gMaxRetries = 50;
 function WidgetDidShow()
 {
     if (gClockTimeout) clearTimeout(gClockTimeout);
+
+    // Make sure we're not running too early which can happen if there are a
+    // lot of Widgets on the Dashboard and it's the initial load
+    if (!gLoaded) {
+        // Try again after a short delay provided we have not exhausted retries
+        if (gMaxRetries) {
+            --gMaxRetries;
+            gClockTimeout = setTimeout('WidgetDidShow();', 200);
+        }
+        return;
+    }
+
     Redraw();
     // The clock hand is 59 pixels long, this corresponds to a 1 pixel movement
     // at the end of the hand when it is rotated by an amount approximately
@@ -1166,12 +1179,25 @@ function ToggleClockOnly()
 }
 
 
+// We must set these here or else we can miss the onshow event when
+// the widget is initially loaded (it can be delivered before WidgetDidLoad
+// finishes running in some peculiar cases)
+if (window.widget) {
+    // Install event handlers.
+
+    widget.onshow   = WidgetDidShow;
+    widget.onhide   = WidgetDidHide;
+    widget.onremove = WidgetWillRemove;
+}
+
+
 // -- WidgetDidLoad --
 //
 // Handles onload event for the widget. Initializes interface elements,
 // creating buttons and installing localized strings. Loads or creates
 // preferences. Sets up widget event handlers.
 //
+var gLoaded = false;
 function WidgetDidLoad()
 {   
     // Do any locale-specific initialization that might need to be performed.
@@ -1315,14 +1341,16 @@ function WidgetDidLoad()
         document.getElementById('twilight').value = twilightZenith;
         TwilightDidChange();
     }
-    
-    
-    // Install event handlers. (The onshow event fires immediately after this
-    // function returns.)
-    
-    widget.onshow   = WidgetDidShow;
-    widget.onhide   = WidgetDidHide;
-    widget.onremove = WidgetWillRemove;
+
+    // If WidgetDidShow gets called too soon, it will retry until gLoaded
+    // becomes true
+    gLoaded = true;
+
+    // Make sure we don't miss the initial onshow event (it can sometimes
+    // get dropped when there are a lot of widgets during initial load)
+    if (!gClockTimeout) {
+        gClockTimeout = setTimeout('WidgetDidShow();', 200);
+    }
 }
 
 // -- aboutURL --
