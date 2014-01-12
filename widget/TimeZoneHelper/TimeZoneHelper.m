@@ -204,7 +204,7 @@ static int compare_city(const void *p1, const void *p2)
 {
     NSTimeZone *newTimeZone = [NSTimeZone timeZoneWithName:name];
     if (! newTimeZone) return;
-    
+
     [_timeZone release];
     _timeZone = [newTimeZone retain];
 }
@@ -222,20 +222,18 @@ static int compare_city(const void *p1, const void *p2)
     [formatter setTimeZone:_timeZone];
     [formatter setTimeStyle:NSDateFormatterShortStyle];
     [formatter setDateStyle:NSDateFormatterNoStyle];
-    
+
     NSDate *date = [NSDate dateWithTimeIntervalSince1970: dateMillis / 1000.0];
-    
+
     NSString *formattedTime = [formatter stringFromDate:date];
-    
+
     [formatter release];
-    
-    
+
     // This hack prevents layout issues when a German-speaking user has "Uhr" on the end of their time format.
-    
+
     if ([formattedTime hasSuffix:@" Uhr"])
         formattedTime = [formattedTime substringToIndex:[formattedTime length] - 4];
-    
-    
+
     return formattedTime;
 }
 
@@ -246,12 +244,12 @@ static int compare_city(const void *p1, const void *p2)
 
     ABPerson *me = [[ABAddressBook sharedAddressBook] me];
     if (! me) return nil;
-    
+
     ABMultiValue *addresses = [me valueForProperty:kABAddressProperty];
     NSDictionary *primaryAddress = [addresses valueAtIndex:[addresses indexForIdentifier:[addresses primaryIdentifier]]];
-    
+
     NSString *countryCodeISO = [[primaryAddress objectForKey:kABAddressCountryCodeKey] uppercaseString];
-    
+
     if ([countryCodeISO isEqualToString:@"US"])
     {
         NSString *stateCode = [primaryAddress objectForKey:kABAddressStateKey];
@@ -269,10 +267,10 @@ static int compare_city(const void *p1, const void *p2)
 
     ABPerson *me = [[ABAddressBook sharedAddressBook] me];
     if (! me) return nil;
-    
+
     ABMultiValue *addresses = [me valueForProperty:kABAddressProperty];
     NSDictionary *primaryAddress = [addresses valueAtIndex:[addresses indexForIdentifier:[addresses primaryIdentifier]]];
-    
+
     return [primaryAddress objectForKey:kABAddressCityKey];
 }
 
