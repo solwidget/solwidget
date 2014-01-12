@@ -66,6 +66,12 @@ var gWhiteInfoButton;
 var gClockOnly;
 var gExpandedWidth;
 var gBackSizeAdjust;
+var gFrontHeight = 163;
+var gBackHeight = 180;
+
+
+// Whether to show the midday time
+var gShowMidday;
 
 
 // Timer for periodic updates.
@@ -155,6 +161,17 @@ function TwilightDidChange()
             document.getElementById('twilightIcon').style.display = 'none';
         }
     }
+}
+
+
+// -- MiddayDidChange --
+//
+// Handle changes to the show midday setting
+//
+function MiddayDidChange()
+{
+    gShowMidday = document.getElementById('midday').checked;
+    widget.setPreferenceForKey(gShowMidday, widget.identifier + '-showMidday');
 }
 
 
@@ -595,6 +612,46 @@ function TimeString(hours)
 }
 
 
+// -- AdjustClockMidday --
+//
+// Adjusts all the properties so the midday related elements are set properly
+// based on the current preferences
+//
+function AdjustClockMidday()
+{
+    if (gClockOnly)
+    {
+        document.getElementById('tableWrapper').style.display = 'none';
+        document.getElementById('bandAid').style.width = '12px';
+        document.getElementById('bandAid').style.height = '4px';
+        document.getElementById('bandAid').style.display = 'block';
+        document.getElementById('middayLine').style.display = 'none';
+        document.getElementById('middayCell').style.display = 'none';
+    }
+    else if (gShowMidday)
+    {
+        document.getElementById('tableWrapper').style.display = 'table';
+        document.getElementById('middayCell').style.display = 'table-cell';
+        document.getElementById('bandAid').style.width = String(gExpandedWidth - 137) + 'px';
+        document.getElementById('bandAid').style.height = '4px';
+        document.getElementById('bandAid').style.display = 'block';
+	var leftSide = document.getElementById('tableWrapper').offsetLeft +
+            Math.round((117 - document.getElementById('mainTable').offsetWidth) / 2);
+        var width = document.getElementById('middayLabel').offsetWidth;
+        document.getElementById('middayLine').style.left = String(leftSide) + 'px';
+        document.getElementById('middayLine').style.width = String(width) + 'px';
+        document.getElementById('middayLine').style.display = 'block';
+    }
+    else
+    {
+        document.getElementById('tableWrapper').style.display = 'table';
+        document.getElementById('bandAid').style.display = 'none';
+        document.getElementById('middayLine').style.display = 'none';
+        document.getElementById('middayCell').style.display = 'none';
+    }
+}
+
+
 // -- WidgetDidShow --
 //
 // Handles the onshow event for the widget. Redraws and starts periodic updates.
@@ -676,12 +733,24 @@ function Redraw()
     var sunset  = CalculateSunriseOrSunset(gLatitude, gLongitude, nowMillis, false, false);
     var morningTwilight = CalculateSunriseOrSunset(gLatitude, gLongitude, nowMillis, true, true);
     var eveningTwilight = CalculateSunriseOrSunset(gLatitude, gLongitude, nowMillis, false, true);
+    var midday;
 //  var moonrise = CalculateMoonriseOrMoonset(gLatitude, gLongitude, nowMillis, true);
 //  var moonset = CalculateMoonriseOrMoonset(gLatitude, gLongitude, nowMillis, false);
 
     var sunAlwaysUp   = ((isNaN(sunrise) || !isFinite(sunrise)) && isNull(sunset));
     var sunAlwaysDown = ((isNaN(sunset) || !isFinite(sunset)) && isNull(sunrise));
 
+    if (!sunAlwaysUp && !sunAlwaysDown)
+    {
+        midday = (sunrise + sunset) / 2;
+    }
+    else if (morningTwilight && eveningTwilight)
+    {
+        midday = (morningTwilight + eveningTwilight) / 2;
+    }
+    else {
+        midday = null;
+    }
 
     // Update digital displays.
 
@@ -692,8 +761,8 @@ function Redraw()
     }
     else
     {
-        SetText('sunriseCell',         TimeString(sunrise));
-        SetText('sunsetCell',          TimeString(sunset));
+        SetText('sunriseCell', TimeString(sunrise));
+        SetText('sunsetCell', TimeString(sunset));
     }
 
     if (morningTwilight && eveningTwilight)
@@ -706,7 +775,15 @@ function Redraw()
         SetText('morningTwilightCell', '—');
         SetText('eveningTwilightCell', '—');
     }
-
+    if (midday)
+    {
+        SetText('middayCell', TimeString(midday));
+    }
+    else
+    {
+        SetText('middayCell', '—');
+    }
+    AdjustClockMidday();
 
     // Convert times to radians for drawing analog clock.
 
@@ -714,6 +791,7 @@ function Redraw()
     var sunriseRadians         = MillisToDrawRadians(sunrise, 6.0);
     var sunsetRadians          = MillisToDrawRadians(sunset, 6.0);
     var eveningTwilightRadians = MillisToDrawRadians(eveningTwilight, 6.0);
+    var middayRadians          = MillisToDrawRadians(midday, 6.0);
 //  var moonriseRadians        = MillisToDrawRadians(moonrise, 6.0);
 //  var moonsetRadians         = MillisToDrawRadians(moonset, 6.0);
 
@@ -832,6 +910,15 @@ function Redraw()
         context.fillStyle = '#002F80';
         context.fill();
     }
+    if (gShowMidday && middayRadians)
+    {
+        // Draw midday line
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.arc(0, 0, 50, middayRadians - 0.01, middayRadians + 0.01, false);
+        context.fillStyle = '#E10000';
+        context.fill();
+    }
 
 
     // Draw moon arc.
@@ -906,6 +993,7 @@ function WidgetWillRemove()
     widget.setPreferenceForKey(null, widget.identifier + '-selectedState');
     widget.setPreferenceForKey(null, widget.identifier + '-timeZone');
     widget.setPreferenceForKey(null, widget.identifier + '-twilightZenith');
+    widget.setPreferenceForKey(null, widget.identifier + '-showMidday');
 }
 
 
@@ -958,6 +1046,7 @@ function SaveSettings()
     gSavedSettings.state    = document.getElementById('state').value;
     gSavedSettings.city     = document.getElementById('city').value;
     gSavedSettings.twilight = document.getElementById('twilight').value;
+    gSavedSettings.midday   = document.getElementById('midday').checked;
 }
 
 
@@ -972,7 +1061,9 @@ function RestoreSettings()
     document.getElementById('state').value    = gSavedSettings.state;
     document.getElementById('city').value     = gSavedSettings.city;
     document.getElementById('twilight').value = gSavedSettings.twilight;
+    document.getElementById('midday').checked = gSavedSettings.midday;
     TwilightDidChange();
+    MiddayDidChange();
 }
 
 
@@ -985,20 +1076,17 @@ function FlipToBack()
     var front = document.getElementById("front");
     var back  = document.getElementById("back");
 
-    if (gClockOnly)
-    {
+    if (gClockOnly) {
         document.getElementById('infoButton').style.display = 'none';
-        window.resizeTo(gExpandedWidth + gBackSizeAdjust, window.innerHeight);
-    }
-    else if (gBackSizeAdjust)
-    {
-        window.resizeTo(gExpandedWidth + gBackSizeAdjust, window.innerHeight);
+        window.resizeTo(gExpandedWidth, gFrontHeight);
     }
 
     widget.prepareForTransition("ToBack");
 
     front.style.display = "none";
     back.style.display = "block";
+
+    window.resizeTo(gExpandedWidth + gBackSizeAdjust, gBackHeight);
 
     SaveSettings();
     setTimeout("widget.performTransition(); document.getElementById('infoButton').style.display = 'block';", 0);
@@ -1108,9 +1196,9 @@ function FlipToFront(discardChanges)
     front.style.display = "block";
 
     if (gClockOnly)
-        window.resizeTo(149, window.innerHeight);
-    else if (gBackSizeAdjust)
-        window.resizeTo(gExpandedWidth, window.innerHeight);
+        window.resizeTo(149, gFrontHeight);
+    else
+        window.resizeTo(gExpandedWidth, gFrontHeight);
 
     setTimeout("widget.performTransition(); WidgetDidShow();", 0);
 }
@@ -1139,6 +1227,8 @@ function ToggleClockOnly()
     if (gClockOnly)
     {
         document.getElementById('tableWrapper').style.display = 'none';
+        document.getElementById('bandAid').style.width = '12px';
+        document.getElementById('middayLine').style.display = 'none';
         var target = 149;
         var increment = -15;
     }
@@ -1163,7 +1253,7 @@ function ToggleClockOnly()
 
     // Make sure width matches target.
 
-    window.resizeTo(target, window.innerHeight);
+    window.resizeTo(target, gFrontHeight);
     document.getElementById('bgCenter').style.width = String(target - 149) + 'px';
     document.getElementById('bgRight').style.left = String(target - 19) + 'px';
     document.getElementById('placeName').style.width = String(target - 48) + 'px';
@@ -1171,11 +1261,7 @@ function ToggleClockOnly()
 
     // Show and hide some elements.
 
-    if (gClockOnly)
-        document.getElementById('bandAid').style.display = 'block';
-    else
-        document.getElementById('tableWrapper').style.display = 'table';
-
+    AdjustClockMidday();
     document.getElementById('infoButton').style.display = 'block';
     TwilightDidChange();
 }
@@ -1262,16 +1348,9 @@ function WidgetDidLoad()
     // Collapse if necessary.
 
     gClockOnly = widget.preferenceForKey(widget.identifier + '-clockOnly');
-
-    if (gClockOnly)
-    {
-        document.getElementById('bandAid').style.display = 'block';
-        document.getElementById('tableWrapper').style.display = 'none';
-        window.resizeTo(149, window.innerHeight);
-        document.getElementById('bgCenter').style.width = '0px';
-        document.getElementById('bgRight').style.left = '130px';
-        document.getElementById('placeName').style.width = '101px';
-    }
+    gShowMidday = widget.preferenceForKey(widget.identifier + '-showMidday');
+    document.getElementById('midday').checked = gShowMidday ? true : false;
+    AdjustClockMidday();
 
 
     // Get location and time zone from preferences, or set to default.

@@ -2,7 +2,7 @@
 
 Sol Widget CSS
 Copyright (C) 2006 Daniel S. Neumeyer
-Portions Copyright (C) 2010,2011 Kyle J. McKay
+Portions Copyright (C) 2010,2011,2014 Kyle J. McKay
 All rights reserved
 
 Redistribution and use in source and binary forms, with or without
@@ -86,7 +86,7 @@ body
     margin: 0;
     padding: 14px 24px 0 24px;
     width: 224px;
-    height: 149px;
+    height: 166px;
 }
 
 #tableWrapper
@@ -134,7 +134,7 @@ canvas
 {
     position: absolute;
     right: 19px;
-    bottom: 24px;
+    bottom: 23px;
 }
 
 #mapIcon
@@ -191,6 +191,19 @@ a, a:hover, a:active, a:visited
     top: 66px;
     left: 126px;
     display: none;
+    z-index: -1;
+}
+
+#middayLine
+{
+    position: absolute;
+    top: 68px;
+    left: 126px;
+    height: 1px;
+    width: 12px;
+    background-color: #E10000;
+    opacity: 0.6667;
+    display: none;
 }
 
 #settingsTable
@@ -208,4 +221,32 @@ a, a:hover, a:active, a:visited
 #twilightRow td
 {
     border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+#optionsRow
+{
+    text-align: center;
+}
+
+#optionsRow input
+{
+    margin-right: 0;
+}
+
+#middaytextline
+{
+    display: inline-block;
+    background-color: #E10000;
+    opacity: 0.6667;
+    width: 1em;
+    height: 1px;
+    vertical-align: baseline;
+    position: relative;
+    top: -0.5ex
+}
+
+#UTC,
+#numbers
+{
+    margin-left: 1ex;
 }
