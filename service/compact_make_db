@@ -2,7 +2,7 @@
 
 # compact_make_db version 1.0.3
 # Makes the compact, compressed database used for Sol lookups.
-# Copyright (C) 2010,2011 Kyle J. McKay.  All rights reserved.
+# Copyright (C) 2010,2011,2014 Kyle J. McKay.  All rights reserved.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -256,10 +256,10 @@ sub main
   
   close($datah);
 
-  $cmd = "'$gzip' -9 '$database'";
+  $cmd = "'$gzip' -n9 '$database'";
   #$cmd = "'$bzip2' -9 '$database'";
   print STDERR "$cmd\n";
-  system($cmd) and die "Unable to gzip -9 the database\n";
+  system($cmd) and die "Unable to gzip -n9 the database\n";
   #system($cmd) and die "Unable to bzip2 -9 the database\n";
   
   return 0;
