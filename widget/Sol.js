@@ -65,6 +65,7 @@ var gWhiteInfoButton;
 
 var gClockOnly;
 var gExpandedWidth;
+var gFrontSizeAdjust;
 var gBackSizeAdjust;
 var gFrontHeight = 163;
 var gBackHeight = 180;
@@ -619,8 +620,10 @@ function TimeString(hours)
 //
 function AdjustClockMidday()
 {
+    var targetWidth;
     if (gClockOnly)
     {
+        targetWidth = 149;
         document.getElementById('tableWrapper').style.display = 'none';
         document.getElementById('bandAid').style.width = '12px';
         document.getElementById('bandAid').style.height = '4px';
@@ -630,12 +633,13 @@ function AdjustClockMidday()
     }
     else if (gShowMidday)
     {
+        targetWidth = gExpandedWidth;
         document.getElementById('tableWrapper').style.display = 'table';
         document.getElementById('middayCell').style.display = 'table-cell';
         document.getElementById('bandAid').style.width = String(gExpandedWidth - 137) + 'px';
         document.getElementById('bandAid').style.height = '4px';
         document.getElementById('bandAid').style.display = 'block';
-	var leftSide = document.getElementById('tableWrapper').offsetLeft +
+        var leftSide = document.getElementById('tableWrapper').offsetLeft +
             Math.round((117 - document.getElementById('mainTable').offsetWidth) / 2);
         var width = document.getElementById('middayLabel').offsetWidth;
         document.getElementById('middayLine').style.left = String(leftSide) + 'px';
@@ -644,10 +648,21 @@ function AdjustClockMidday()
     }
     else
     {
+        targetWidth = gExpandedWidth;
         document.getElementById('tableWrapper').style.display = 'table';
         document.getElementById('bandAid').style.display = 'none';
         document.getElementById('middayLine').style.display = 'none';
         document.getElementById('middayCell').style.display = 'none';
+    }
+    if (window.innerWidth != targetWidth || window.innerHeight != gExpandedWidth)
+    {
+        if (!isBackSide())
+            window.resizeTo(targetWidth, gFrontHeight);
+
+        // Make sure width matches target.
+        document.getElementById('bgCenter').style.width = String(targetWidth - 149) + 'px';
+        document.getElementById('bgRight').style.left = String(targetWidth - 19) + 'px';
+        document.getElementById('placeName').style.width = String(targetWidth - 48) + 'px';
     }
 }
 
@@ -1251,15 +1266,7 @@ function ToggleClockOnly()
     }
 
 
-    // Make sure width matches target.
-
-    window.resizeTo(target, gFrontHeight);
-    document.getElementById('bgCenter').style.width = String(target - 149) + 'px';
-    document.getElementById('bgRight').style.left = String(target - 19) + 'px';
-    document.getElementById('placeName').style.width = String(target - 48) + 'px';
-
-
-    // Show and hide some elements.
+    // Update widget width and show and hide some elements.
 
     AdjustClockMidday();
     document.getElementById('infoButton').style.display = 'block';
@@ -1306,9 +1313,10 @@ function WidgetDidLoad()
     // Do any locale-specific initialization that might need to be performed.
     // (In particular, the German and Dutch localizations need to widen the window.)
 
+    gFrontSizeAdjust = 0;
     gBackSizeAdjust = 0;
     if (window.LocaleInit) LocaleInit();
-    gExpandedWidth = window.innerWidth;
+    gExpandedWidth = 272 + gFrontSizeAdjust;
 
 
     // Create buttons for flipping.
