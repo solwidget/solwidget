@@ -405,7 +405,7 @@ function CalculateMoonriseOrMoonset(latitude, longitude, date, moonrise)
     longitude /= 360.0;
 
 
-    var P1 = 3.14159265;
+    var P1 = Math.PI;
     var P2 = 2.0 * P1;
     var R1 = P1 / 180.0;
     var K1 = 15.0 * R1 * 1.0027379;
@@ -745,7 +745,7 @@ function MillisToDrawRadians(millis, hourOffset)
   hours += hourOffset;
   while (hours >= 24.0) hours -= 24.0;
   while (hours <   0.0) hours += 24.0;
-  return (hours / 24.0) * 6.28318530717959;
+  return (hours / 24.0) * 2.0 * Math.PI;
 }
 
 // -- Redraw --
@@ -968,13 +968,13 @@ function Redraw()
 
     var endPointX = (40 - moonArcThickness / 2.0) * Math.cos(moonsetRadians);
     var endPointY = (40 - moonArcThickness / 2.0) * Math.sin(moonsetRadians);
-    context.arc(endPointX, endPointY, moonArcThickness / 2.0, moonsetRadians, moonsetRadians + 3.14159, ! moonDoesSet);
+    context.arc(endPointX, endPointY, moonArcThickness / 2.0, moonsetRadians, moonsetRadians + Math.PI, ! moonDoesSet);
 
     context.arc(0, 0, 40 - moonArcThickness, moonsetRadians, moonriseRadians, true);
 
     endPointX = (40 - moonArcThickness / 2.0) * Math.cos(moonriseRadians);
     endPointY = (40 - moonArcThickness / 2.0) * Math.sin(moonriseRadians);
-    context.arc(endPointX, endPointY, moonArcThickness / 2.0, moonriseRadians + 3.14159, moonriseRadians, ! moonDoesRise);
+    context.arc(endPointX, endPointY, moonArcThickness / 2.0, moonriseRadians + Math.PI, moonriseRadians, ! moonDoesRise);
 
     context.closePath();
     context.fillStyle = '#FFFFFF';
