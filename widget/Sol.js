@@ -599,9 +599,11 @@ function TimeString(hours)
 //
 // Handles the onshow event for the widget. Redraws and starts periodic updates.
 //
+var gShown = false;
 var gMaxRetries = 50;
 function WidgetDidShow()
 {
+    gShown = true;
     if (gClockTimeout) clearTimeout(gClockTimeout);
 
     // Make sure we're not running too early which can happen if there are a
@@ -1191,6 +1193,21 @@ if (window.widget) {
 }
 
 
+// -- WidgetForceShow --
+//
+// Checks to make sure a WidgetDidShow event has actually taken place.
+// If not one will be forced now.
+//
+function WidgetForceShow()
+{
+    if (!gShown && !gClockTimeout)
+    {
+        // Somehow the initial WidgetDidShow was missed
+        gClockTimeout = setTimeout('WidgetDidShow();', 10);
+    }
+}
+
+
 // -- WidgetDidLoad --
 //
 // Handles onload event for the widget. Initializes interface elements,
@@ -1347,10 +1364,9 @@ function WidgetDidLoad()
     gLoaded = true;
 
     // Make sure we don't miss the initial onshow event (it can sometimes
-    // get dropped when there are a lot of widgets during initial load)
-    if (!gClockTimeout) {
-        gClockTimeout = setTimeout('WidgetDidShow();', 200);
-    }
+    // get dropped when there are a lot of widgets during initial load) and
+    // may never be sent when a widget is forcibly reloaded with Cmd-R
+    setTimeout('WidgetForceShow();', 500);
 }
 
 // -- aboutURL --
