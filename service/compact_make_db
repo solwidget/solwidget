@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# compact_make_db version 1.0.3
+# compact_make_db version 1.0.4
 # Makes the compact, compressed database used for Sol lookups.
 # Copyright (C) 2010,2011,2014 Kyle J. McKay.  All rights reserved.
 
@@ -31,10 +31,10 @@ use File::Temp qw(tempfile);
 
 our $VERSION;
 our ($fullme, $me, $medir, $tempdb, $dbh, $database, $toc_offset);
-our (@regions, @timezones, @offsets, @sizes, %keys);
+our (@regions, @timezones, @offsets, @sizes, %keys, %altignore);
 
 BEGIN {
-  $VERSION = '1.0.0';
+  $VERSION = '1.0.4';
 }
 
 INIT {
@@ -79,6 +79,40 @@ sub initial_toc($)
   }
 }
 
+sub compute_ignore_alt_list($)
+{
+  my $dbh = shift;
+  %altignore = ();
+  my $ignorecount = 0;
+  my $regioncount = 0;
+  my $lastregionname = '';
+  my $region;
+
+  my $sth = $dbh->prepare(q{
+    SELECT a.region, a.uc_alt_name
+    FROM sol_places a, sol_places b
+    WHERE a.uc_alt_name IS NOT NULL AND a.uc_alt_name != ''
+          AND a.uc_alt_name = b.uc_name
+          AND a.region IS NOT NULL AND a.region != '' AND a.region = b.region
+    GROUP BY a.region, a.uc_alt_name
+    ORDER BY a.region, a.uc_alt_name
+  });
+  die "Cannot prepare statement\n" if !$sth;
+  $sth->execute() or die "Cannot execute select\n";
+  while (my $ar = $sth->fetch()) {
+    if ($$ar[0] ne $lastregionname) {
+      ++$regioncount;
+      $lastregionname = $$ar[0];
+      $region = {};
+      $altignore{$lastregionname} = $region;
+    }
+    ++$ignorecount;
+    $$region{$$ar[1]} = 1;
+  }
+  print STDERR "Ignoring $ignorecount covering alt name(s) ",
+    "in $regioncount region(s)\n";
+}
+
 sub compute_offsets()
 {
   my $offset = 0;
@@ -111,12 +145,12 @@ sub update_toc($)
 sub write_data($$)
 {
   my ($dbh, $fh) = @_;
-  my ($lastlat, $lastlon, $lastkey, $key, $lastll, $ll, $breakout);
+  my ($lastlat, $lastlon, $lastkey, $key, $lastll, $ll, $breakout, $skipregion);
   my $i = -1;
   # %llnames has lc(name) keys and original as value
   # %llaltnames has lc(name) keys and hashref of lc(altname)s as values
-  my (%llnames, %llaltnames, $namecnt, $altcnt, $llcnt);
-  my ($totalrt, $totalnm, $totalalt, $totalll) = (0,0,0,0);
+  my (%llnames, %llaltnames, $namecnt, $altcnt, $skipcnt, $llcnt);
+  my ($totalrt, $totalnm, $totalalt, $totalll, $totalskipalt) = (0,0,0,0,0);
   my $sth = $dbh->prepare(q{
     SELECT region, time_zone, latitude, longitude, name, uc_alt_name
     FROM sol_places
@@ -164,10 +198,12 @@ sub write_data($$)
         # anything left to do to finish up the previous region goes here
         print $fh pack('C', 0);
         $sizes[$i] += 1;
-        print STDERR "    NAMECNT=$namecnt  LLCNT=$llcnt  ALTCNT=$altcnt\n";
+        print STDERR "    NAMECNT=$namecnt  LLCNT=$llcnt  ALTCNT=$altcnt  ",
+          "SKIPALT=$skipcnt\n";
         ++$totalrt;
         $totalnm += $namecnt;
         $totalalt += $altcnt;
+        $totalskipalt += $skipcnt;
         $totalll += $llcnt;
       }
       if ($key ne '|') {
@@ -180,6 +216,8 @@ sub write_data($$)
       $llcnt = 0;
       $namecnt = 0;
       $altcnt = 0;
+      $skipcnt = 0;
+      $skipregion = $altignore{$$ar[0]} || {};
     }
     if ($ll ne $lastll || $breakout) {
       $lastll = $ll;
@@ -195,10 +233,15 @@ sub write_data($$)
       ++$namecnt;
       $llaltnames{lc($$ar[4])} = {};
     }
-    my $althash = $llaltnames{lc($$ar[4])};
-    if ($$ar[5] && !$$althash{lc($$ar[5])}) {
-      $$althash{lc($$ar[5])} = $$ar[5];
-      ++$altcnt;
+    if ($$ar[5] && $$skipregion{$$ar[5]}) {
+      ++$skipcnt;
+    }
+    else {
+      my $althash = $llaltnames{lc($$ar[4])};
+      if ($$ar[5] && !$$althash{lc($$ar[5])}) {
+        $$althash{lc($$ar[5])} = $$ar[5];
+        ++$altcnt;
+      }
     }
   };
 
@@ -207,7 +250,8 @@ sub write_data($$)
   }
   &$prow(['','','','','','']);
   print STDERR "TOTALS: ",
-    "REG+TZ=$totalrt  NAME=$totalnm  LATLON=$totalll  ALTNAME=$totalalt\n";
+    "REG+TZ=$totalrt  NAME=$totalnm  LATLON=$totalll  ALTNAME=$totalalt  ",
+    "SKIPALT=$totalskipalt\n";
 }
 
 sub main
@@ -245,6 +289,8 @@ sub main
   
   print STDERR "Generating TOC...\n";
   initial_toc($dbh);
+  print STDERR "Computing alt ignore list...\n";
+  compute_ignore_alt_list($dbh);
   print STDERR "Writing place-holder TOC...\n";
   write_toc($datah);
   print STDERR "Generating DATA...\n";
