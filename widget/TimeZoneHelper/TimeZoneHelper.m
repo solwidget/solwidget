@@ -4,7 +4,7 @@
 //
 //  Created by Dan Neumeyer on 2006-01-10
 //  Copyright (C) 2006 Daniel S. Neumeyer
-//  Portions Copyright (C) 2010,2011 Kyle J. McKay
+//  Portions Copyright (C) 2010,2011,2014 Kyle J. McKay
 //  All Rights Reserved
 //
 //
@@ -149,6 +149,8 @@ static int compare_city(const void *p1, const void *p2)
 {
     if (aSelector == @selector(formattedTimeForDate:))
         return @"formattedTimeForDate";
+    if (aSelector == @selector(formattedUTCTimeForDate:))
+        return @"formattedUTCTimeForDate";
     if (aSelector == @selector(log:))
         return @"log";
     if (aSelector == @selector(lookupPlaceInRegion:withName:))
@@ -166,6 +168,8 @@ static int compare_city(const void *p1, const void *p2)
     if (aSelector == @selector(allTimeZones))
         return NO;
     if (aSelector == @selector(formattedTimeForDate:))
+        return NO;
+    if (aSelector == @selector(formattedUTCTimeForDate:))
         return NO;
     if (aSelector == @selector(localTimeZoneName))
         return NO;
@@ -216,10 +220,10 @@ static int compare_city(const void *p1, const void *p2)
     return [_timeZone secondsFromGMTForDate: date] * 1000.0;
 }
 
-- (NSString *)formattedTimeForDate:(double)dateMillis
+- (NSString *)formattedZone: (NSTimeZone *)zone timeForDate:(double)dateMillis
 {
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setTimeZone:_timeZone];
+    [formatter setTimeZone:zone];
     [formatter setTimeStyle:NSDateFormatterShortStyle];
     [formatter setDateStyle:NSDateFormatterNoStyle];
 
@@ -235,6 +239,16 @@ static int compare_city(const void *p1, const void *p2)
         formattedTime = [formattedTime substringToIndex:[formattedTime length] - 4];
 
     return formattedTime;
+}
+
+- (NSString *)formattedTimeForDate:(double)dateMillis
+{
+    return [self formattedZone: _timeZone timeForDate: dateMillis];
+}
+
+- (NSString *)formattedUTCTimeForDate:(double)dateMillis
+{
+    return [self formattedZone: [NSTimeZone timeZoneForSecondsFromGMT: 0] timeForDate: dateMillis];
 }
 
 - (NSString *)myRegionCode

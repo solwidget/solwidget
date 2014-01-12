@@ -4,7 +4,7 @@
 //
 //  Created by Dan Neumeyer on 2006-01-10
 //  Copyright (C) 2006 Daniel S. Neumeyer
-//  Portions Copyright (C) 2010,2011 Kyle J. McKay
+//  Portions Copyright (C) 2010,2011,2014 Kyle J. McKay
 //  All Rights Reserved
 //
 //
@@ -51,6 +51,7 @@
 - (void)setTimeZoneWithName:(NSString *)name;
 - (double)timeOffsetMillisForDate:(double)dateMillis;
 - (NSString *)formattedTimeForDate:(double)dateMillis;
+- (NSString *)formattedUTCTimeForDate:(double)dateMillis;
 - (NSString *)lookupPlaceInRegion:(NSString *)region withName:(NSString *)name;
 
 - (NSString *)myRegionCode;

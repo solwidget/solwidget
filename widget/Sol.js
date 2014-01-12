@@ -75,6 +75,10 @@ var gBackHeight = 180;
 var gShowMidday;
 
 
+// Whether to use UTC digital times
+var gUseUTCTimes;
+
+
 // Timer for periodic updates.
 
 var gClockTimeout = false;
@@ -173,6 +177,17 @@ function MiddayDidChange()
 {
     gShowMidday = document.getElementById('midday').checked;
     widget.setPreferenceForKey(gShowMidday, widget.identifier + '-showMidday');
+}
+
+
+// -- UTCDidChange --
+//
+// Handle changes to the show UTC times setting
+//
+function UTCDidChange()
+{
+    gUseUTCTimes = document.getElementById('UTC').checked;
+    widget.setPreferenceForKey(gUseUTCTimes, widget.identifier + '-useUTC');
 }
 
 
@@ -597,7 +612,7 @@ function SetTextTitle(id, text)
 // -- TimeString --
 //
 // Returns a string representation of a given time, formatted with the user's
-// short time format in the location's time zone.
+// short time format in the location's time zone or UTC (if gUseUTCTimes active)
 //
 // Parameters
 //   hours - time in milliseconds since 1970 GMT
@@ -609,7 +624,8 @@ function TimeString(hours)
 {
     if (hours == null) return '';
 
-    return window.TimeZoneHelper.formattedTimeForDate(hours);
+    return gUseUTCTimes ? window.TimeZoneHelper.formattedUTCTimeForDate(hours)
+                        : window.TimeZoneHelper.formattedTimeForDate(hours);
 }
 
 
@@ -1009,6 +1025,7 @@ function WidgetWillRemove()
     widget.setPreferenceForKey(null, widget.identifier + '-timeZone');
     widget.setPreferenceForKey(null, widget.identifier + '-twilightZenith');
     widget.setPreferenceForKey(null, widget.identifier + '-showMidday');
+    widget.setPreferenceForKey(null, widget.identifier + '-useUTC');
 }
 
 
@@ -1062,6 +1079,7 @@ function SaveSettings()
     gSavedSettings.city     = document.getElementById('city').value;
     gSavedSettings.twilight = document.getElementById('twilight').value;
     gSavedSettings.midday   = document.getElementById('midday').checked;
+    gSavedSettings.UTC      = document.getElementById('UTC').checked;
 }
 
 
@@ -1077,8 +1095,10 @@ function RestoreSettings()
     document.getElementById('city').value     = gSavedSettings.city;
     document.getElementById('twilight').value = gSavedSettings.twilight;
     document.getElementById('midday').checked = gSavedSettings.midday;
+    document.getElementById('UTC').checked    = gSavedSettings.UTC;
     TwilightDidChange();
     MiddayDidChange();
+    UTCDidChange();
 }
 
 
@@ -1359,6 +1379,8 @@ function WidgetDidLoad()
     gShowMidday = widget.preferenceForKey(widget.identifier + '-showMidday');
     document.getElementById('midday').checked = gShowMidday ? true : false;
     AdjustClockMidday();
+    gUseUTCTimes = widget.preferenceForKey(widget.identifier + '-useUTC');
+    document.getElementById('UTC').checked = gUseUTCTimes ? true : false;
 
 
     // Get location and time zone from preferences, or set to default.
