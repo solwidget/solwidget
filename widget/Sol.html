@@ -43,14 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <script type="text/javascript" src="Sol.js"></script>
     </head>
     <body onload="WidgetDidLoad();" onkeypress="bodyKeyPress(event);">
-        
-        
+
+
         <div id="front">
             <img id="bgLeft"   src="BackgroundLeft.png"   alt="" />
             <img id="bgCenter" src="BackgroundCenter.png" alt="" />
             <img id="bgRight"  src="BackgroundRight.png"  alt="" />
             <img id="bandAid"  src="BandAid.png"          alt="" />
-            
+
             <canvas id="clock" height="100" width="100" onclick="ToggleClockOnly();"></canvas>
 
             <div id="tableWrapper">
@@ -76,15 +76,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     </tr>
                 </table>
             </div>
-            
+
             <div id="twilightIcon"><img id="twilightImg" src="" alt="" /></div>
-            
+
             <div id="placeName"></div>
-            
+
             <div id="infoButton"></div>
         </div>
-        
-        
+
+
         <div id="back">
             <table id="settingsTable">
                 <tr>
@@ -403,7 +403,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     </td>
                 </tr>
             </table>
-            
+
             <div id="about">
                 <span onclick="PerformLookup(true); widget.openURL(mapURL());" class="ctrl link"><img id="mapIcon" src="gm.png" alt="" /></span>
                 <span onclick="widget.openURL(aboutURL());" class="ctrl link"><span id="aboutLabel"></span></span>
@@ -411,7 +411,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </div>
             <div id="doneButton"></div>
         </div>
-        
-        
+
+
     </body>
 </html>

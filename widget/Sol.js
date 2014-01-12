@@ -118,8 +118,8 @@ function message(s)
 function CountryDidChange()
 {
     var countryMenu = document.getElementById('country');
-    
-    document.getElementById('stateRow').style.display = 
+
+    document.getElementById('stateRow').style.display =
         countryMenu.options[countryMenu.selectedIndex].value == 'US'
         ? 'table-row'
         : 'none';
@@ -230,9 +230,9 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     var day   = utc.getUTCDate();
     var month = utc.getUTCMonth() + 1;
     var year  = utc.getUTCFullYear();
-    
+
     var zenith;
-    
+
     if (twilight)
     {
         var twilightSelect = document.getElementById('twilight');
@@ -240,71 +240,71 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     }
     else
         zenith = 90.8333333333;
-    
-    
+
+
     // Calculate the day of the year.
 
     var N1 = Math.floor(275.0 * month / 9.0);
     var N2 = Math.floor((month + 9.0) / 12.0);
     var N3 = 1.0 + Math.floor((year - 4.0 * Math.floor(year / 4.0) + 2.0) / 3.0);
     var N = N1 - (N2 * N3) + day - 30.0;
-    
-    
+
+
     // Convert the longitude to hour value and calculate an approximate time.
 
     var lngHour, t;
-    
+
     lngHour = longitude / 15.0;
-    
+
     if (sunrise)
         t = N + ((6.0 - lngHour) / 24.0);
     else
         t = N + ((18.0 - lngHour) / 24.0)
-    
-    
+
+
     // Calculate the sun's mean anomaly.
-    
+
     var M = (0.9856 * t) - 3.289;
-    
-    
+
+
     // Calculate the sun's true longitude.
-    
+
     var L = M + (1.916 * sinD(M)) + (0.020 * sinD(2 * M)) + 282.634;
-    
+
     while (L >= 360) L -= 360.0;
     while (L <  0)   L += 360.0;
-    
-    
+
+
     // Caculate the sun's right ascension.
-    
+
     var RA = atanD(0.91764 * tanD(L));
-    
+
     while (RA >= 360) RA -= 360.0;
     while (RA <  0)   RA += 360.0;
-    
-    
+
+
     // Right ascension value needs to be in the same quadrant as L.
-    
+
     var Lquadrant = Math.floor(L / 90.0) * 90.0;
     var RAquadrant = Math.floor(RA / 90.0) * 90.0;
     RA = RA + (Lquadrant - RAquadrant);
-    
-    
+
+
     // Right ascension value needs to be converted into hours.
-    
+
     RA /= 15.0;
-    
-    
+
+
     // Calculate the sun's declination.
-    
+
     var sinDec = 0.39782 * sinD(L);
     var cosDec = cosD(asinD(sinDec));
-    
-    
+
+
     // Calculate the sun's local hour angle.
-    
+
     var cosH = (cosD(zenith) - (sinDec * sinD(latitude))) / (cosDec * cosD(latitude));
-    
+
     if (sunrise)
     {
         if (cosH > 1) return null;
@@ -313,25 +313,25 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
     {
         if (cosH < -1) return null;
     }
-        
-    
+
+
     // Finish calculating H and convert into hours.
-    
+
     var H;
 
     if (sunrise)
         H = 360.0 - acosD(cosH);
     else
         H = acosD(cosH);
-    
+
     H /= 15.0
-    
-    
+
+
     // Calculate local mean time of rising.
-    
+
     var T = H + RA - (0.06571 * t) - 6.622;
-    
-    
+
+
     // Normalize to [0,24) range
 
     while (T >= 24) T -= 24.0;
@@ -339,9 +339,9 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
 
 
     // Adjust back to UTC.
-    
+
     var UT = T - lngHour;
-    
+
     return utc.getTime() + (UT * 3600000.0);  // multiply UT by milliseconds per hour
 }
 
@@ -364,42 +364,42 @@ function CalculateSunriseOrSunset(latitude, longitude, date, sunrise, twilight)
 function CalculateMoonriseOrMoonset(latitude, longitude, date, moonrise)
 {
     // Source: Sky & Telescope magazine, July 1989, p78
-    
+
     day   = date.getDate();
     month = date.getMonth() + 1;
     year  = date.getFullYear();
-    
+
     longitude /= 360.0;
-    
-    
+
+
     var P1 = 3.14159265;
     var P2 = 2.0 * P1;
     var R1 = P1 / 180.0;
     var K1 = 15.0 * R1 * 1.0027379;
-            
+
     var M = new Array(new Array(4), new Array(4), new Array(4), new Array(4));
-    
-    
+
+
     J = -Int(7.0 * (Int((month + 9.0) / 12.0) + year) / 4.0);
-    
+
     S = Sign(month - 9);
     A = Math.abs(month - 9);
     J3 = Int(year + S * Int(A / 7.0));
     J3 = -Int((Int(J3 / 100.0) + 1.0) * 3.0 / 4.0);
-    
+
     J += Int(275.0 * month / 9.0) + day + J3
         + 1721028.0 + 367.0 * year;
-    
+
     T = (J - 2451545.0) + 0.5;
-    
-    
+
+
     T0 = T / 36525.0;
     S = 24110.5 + 8640184.813 * T0 + 86400.0 * longitude;
     S /= 86400.0;
     S -= Int(S);
     T0 = S * 360.0 * R1;
-    
-    
+
+
     for (I = 1; I <= 3; I++)
     {
         L = 0.606434 + 0.03660110129 * T;
@@ -408,21 +408,21 @@ function CalculateMoonriseOrMoonset(latitude, longitude, date, moonrise)
         D = 0.827362 + 0.03386319198 * T;
         N = 0.347343 - 0.00014709391 * T;
         G = 0.993126 + 0.00273777850 * T;
-        
+
         L -= Int(L);
         M0 -= Int(M0);
         F -= Int(F);
         D -= Int(D);
         N -= Int(N);
         G -= Int(G);
-        
+
         L *= P2;
         M0 *= P2;
         F *= P2;
         D *= P2;
         N *= P2;
         G *= P2;
-        
+
         V = 0.39558 * Math.sin(F + N) + 0.08200 * Math.sin(F) + 0.03257 * Math.sin(M0 - F - N) + 0.01092 * Math.sin(M0 + F + N) + 0.00666 * Math.sin(M0 - F) - 0.00644 * Math.sin(M0 + F - 2 * D + N) - 0.00331 * Math.sin(F - 2 * D + N) - 0.00304 * Math.sin(F - 2 * D) - 0.00240 * Math.sin(M0 - F - 2 * D - N) + 0.00226 * Math.sin(M0 + F) - 0.00108 * Math.sin(M0 + F - 2 * D) - 0.00079 * Math.sin(F - N) + 0.00078 * Math.sin(F + 2 * D + N);
         U = 1 - 0.10828 * Math.cos(M0) - 0.01880 * Math.cos(M0 - 2 * D) - 0.01479 * Math.cos(2 * D) + 0.00181 * Math.cos(2 * M0 - 2 * D) - 0.00147 * Math.cos(2 * M0) - 0.00105 * Math.cos(2 * D - G) - 0.00075 * Math.cos(M0 - 2 * D + G);
         W = 0.10478 * Math.sin(M0) - 0.04105 * Math.sin(2 * F + 2 * N) - 0.02130 * Math.sin(M0 - 2 * D) - 0.01779 * Math.sin(2 * F + N) + 0.01774 * Math.sin(N) + 0.00987 * Math.sin(2 * D) - 0.00338 * Math.sin(M0 - 2 * F - 2 * N) - 0.00309 * Math.sin(G) - 0.00190 * Math.sin(2 * F) - 0.00144 * Math.sin(M0 + N) - 0.00144 * Math.sin(M0 - 2 * F - N) - 0.00113 * Math.sin(M0 + 2 * F + 2 * N) - 0.00094 * Math.sin(M0 - 2 * D + G) - 0.00092 * Math.sin(2 * M0 - 2 * D);
@@ -431,17 +431,17 @@ function CalculateMoonriseOrMoonset(latitude, longitude, date, moonrise)
         S = V / Math.sqrt(U);
         D5 = Math.atan(S / Math.sqrt(1 - S * S));
         R5 = 60.40974 * Math.sqrt(U);
-        
+
         M[I][1] = A5;
         M[I][2] = D5;
         M[I][3] = R5;
-        
+
         T = T + 0.5;
     }
-    
+
     if (M[2][1] <= M[1][1]) M[2][1] += P2;
     if (M[3][1] <= M[2][1]) M[3][1] += P2;
-    
+
     Z1 = R1 * (90.567 - 41.685 / M[2][3]);
     S = Math.sin(latitude * R1);
     C = Math.cos(latitude * R1);
@@ -450,9 +450,9 @@ function CalculateMoonriseOrMoonset(latitude, longitude, date, moonrise)
     W8 = 0;
     A0 = M[1][1];
     D0 = M[1][2];
-    
+
     rise = set = null;
-    
+
     for (C0 = 0; C0 < 24; C0++)
     {
         P = (C0 + 1) / 24;
@@ -470,7 +470,7 @@ function CalculateMoonriseOrMoonset(latitude, longitude, date, moonrise)
         B = F2 - F1 - A;
         F = F0 + P * (2 * A + B * (2 * P - 1));
         D2 = F;
-    
+
         L0 = T0 + C0 * K1;
         L2 = L0 + K1;
         if (A2 < A0) A2 = A2 + 2 * P1;
@@ -497,18 +497,18 @@ function CalculateMoonriseOrMoonset(latitude, longitude, date, moonrise)
                 T3 = C0 + E + 1 / 120;
                 H3 = Int(T3);
                 M3 = Int((T3 - H3) * 60);
-                
+
                 time = H3 + (M3 / 60.0);
                 if ((V0 < 0) && (V2 > 0)) rise = time;
                 if ((V0 > 0) && (V2 < 0)) set = time;
             }
         }
-    
+
         A0 = A2;
         D0 = D2;
         V0 = V2;
     }
-    
+
     return moonrise ? rise : set;
 }
 
@@ -536,7 +536,7 @@ function LocalizedStringForKey(key)
     {
         // Do nothing.
     }
-    
+
     return key;
 }
 
@@ -552,10 +552,10 @@ function LocalizedStringForKey(key)
 function SetText(id, text)
 {
     var obj = document.getElementById(id);
-    
+
     while (obj.firstChild)
         obj.removeChild(obj.firstChild);
-    
+
     obj.appendChild(document.createTextNode(text));
 }
 
@@ -590,7 +590,7 @@ function SetTextTitle(id, text)
 function TimeString(hours)
 {
     if (hours == null) return '';
-    
+
     return window.TimeZoneHelper.formattedTimeForDate(hours);
 }
 
@@ -651,7 +651,7 @@ function WidgetDidHide()
 //
 function MillisToDrawRadians(millis, hourOffset)
 {
-  if (isNaN(millis) || isNull(millis)) return millis;
+  if (isNaN(millis) || !isFinite(millis) || isNull(millis)) return millis;
   var utc = new Date(millis + window.TimeZoneHelper.timeOffsetMillisForDate(millis));
   var hours = utc.getUTCHours() + (utc.getUTCMinutes() / 60.0) + (utc.getUTCSeconds() / 3600.0);
   hours += hourOffset;
@@ -679,12 +679,12 @@ function Redraw()
 //  var moonrise = CalculateMoonriseOrMoonset(gLatitude, gLongitude, nowMillis, true);
 //  var moonset = CalculateMoonriseOrMoonset(gLatitude, gLongitude, nowMillis, false);
 
-    var sunAlwaysUp   = (isNaN(sunrise) && isNull(sunset));
-    var sunAlwaysDown = (isNaN(sunset) && isNull(sunrise));
-    
-    
+    var sunAlwaysUp   = ((isNaN(sunrise) || !isFinite(sunrise)) && isNull(sunset));
+    var sunAlwaysDown = ((isNaN(sunset) || !isFinite(sunset)) && isNull(sunrise));
+
+
     // Update digital displays.
-    
+
     if (sunAlwaysUp || sunAlwaysDown)
     {
         SetText('sunriseCell', '—');
@@ -706,45 +706,45 @@ function Redraw()
         SetText('morningTwilightCell', '—');
         SetText('eveningTwilightCell', '—');
     }
-    
-    
+
+
     // Convert times to radians for drawing analog clock.
-    
+
     var morningTwilightRadians = MillisToDrawRadians(morningTwilight, 6.0);
     var sunriseRadians         = MillisToDrawRadians(sunrise, 6.0);
     var sunsetRadians          = MillisToDrawRadians(sunset, 6.0);
     var eveningTwilightRadians = MillisToDrawRadians(eveningTwilight, 6.0);
 //  var moonriseRadians        = MillisToDrawRadians(moonrise, 6.0);
 //  var moonsetRadians         = MillisToDrawRadians(moonset, 6.0);
-    
-    
+
+
     // Prepare canvas.
-    
+
     var canvas = document.getElementById('clock');
     var context = canvas.getContext('2d');
-    
+
     context.clearRect(0, 0, 100, 100);
-    
+
     context.save();
     context.translate(50, 50);
-    
-    
+
+
     // Draw clock.
-    
+
     if (sunAlwaysUp)
     {
         if (eveningTwilight && morningTwilight)
         {
             // Draw twilight segment with slight overlap.
-            
+
             context.beginPath();
             context.moveTo(0, 0);
             context.arc(0, 0, 50, morningTwilightRadians - 0.05, eveningTwilightRadians + 0.05, false);
             context.fillStyle = '#3875D7';
             context.fill();
-            
+
             // Draw daytime segment.
-            
+
             context.beginPath();
             context.moveTo(0, 0);
             context.arc(0, 0, 50, eveningTwilightRadians, morningTwilightRadians, false);
@@ -754,7 +754,7 @@ function Redraw()
         else
         {
             // Draw daytime circle.
-            
+
             context.beginPath();
             context.moveTo(0, 0);
             context.arc(0, 0, 50, 0, -1, false);
@@ -768,15 +768,15 @@ function Redraw()
         if (eveningTwilight && morningTwilight)
         {
             // Draw twilight segment with slight overlap.
-            
+
             context.beginPath();
             context.moveTo(0, 0);
             context.arc(0, 0, 50, morningTwilightRadians - 0.05, eveningTwilightRadians + 0.05, false);
             context.fillStyle = '#3875D7';
             context.fill();
-            
+
             // Draw nighttime segment.
-            
+
             context.beginPath();
             context.moveTo(0, 0);
             context.arc(0, 0, 50, eveningTwilightRadians, morningTwilightRadians, false);
@@ -786,7 +786,7 @@ function Redraw()
         else
         {
             // Draw nighttime circle.
-            
+
             context.beginPath();
             context.moveTo(0, 0);
             context.arc(0, 0, 50, 0, -1, false);
@@ -798,78 +798,78 @@ function Redraw()
     else
     {
         // Draw dusk segment with slight overlap.
-        
+
         context.beginPath();
         context.moveTo(0, 0);
         context.arc(0, 0, 50, sunsetRadians - 0.05, eveningTwilightRadians + 0.05, false);
         context.fillStyle = '#3875D7';
         context.fill();
-        
-        
+
+
         // Draw dawn segment with slight overlap.
-        
+
         context.beginPath();
         context.moveTo(0, 0);
         context.arc(0, 0, 50, morningTwilightRadians - 0.05, sunriseRadians + 0.05, false);
         context.fillStyle = '#3875D7';
         context.fill();
-        
-        
+
+
         // Draw daytime segment.
-        
+
         context.beginPath();
         context.moveTo(0, 0);
         context.arc(0, 0, 50, sunriseRadians, sunsetRadians, false);
         context.fillStyle = '#CDDCF3';
         context.fill();
-        
-        
+
+
         // Draw nighttime segment.
-        
+
         context.beginPath();
         context.moveTo(0, 0);
         context.arc(0, 0, 50, eveningTwilightRadians, morningTwilightRadians, false);
         context.fillStyle = '#002F80';
         context.fill();
     }
-    
-    
+
+
     // Draw moon arc.
-    
+
 /*  var moonArcThickness = 6;
-    
+
     var moonDoesRise = (moonriseRadians != null);
     var moonDoesSet  = (moonsetRadians  != null);
-    
+
     if (! moonDoesRise) moonriseRadians = moonsetRadians + 0.075;
     if (! moonDoesSet)  moonsetRadians  = moonriseRadians - 0.075;
-    
+
     context.beginPath();
     context.moveTo(0, 0);
     context.arc(0, 0, 40, moonriseRadians, moonsetRadians, false);
-    
+
     var endPointX = (40 - moonArcThickness / 2.0) * Math.cos(moonsetRadians);
     var endPointY = (40 - moonArcThickness / 2.0) * Math.sin(moonsetRadians);
     context.arc(endPointX, endPointY, moonArcThickness / 2.0, moonsetRadians, moonsetRadians + 3.14159, ! moonDoesSet);
-    
+
     context.arc(0, 0, 40 - moonArcThickness, moonsetRadians, moonriseRadians, true);
-    
+
     endPointX = (40 - moonArcThickness / 2.0) * Math.cos(moonriseRadians);
     endPointY = (40 - moonArcThickness / 2.0) * Math.sin(moonriseRadians);
     context.arc(endPointX, endPointY, moonArcThickness / 2.0, moonriseRadians + 3.14159, moonriseRadians, ! moonDoesRise);
-    
+
     context.closePath();
     context.fillStyle = '#FFFFFF';
     context.fill();*/
 
 
     // Convert current time to radians.
-    
+
     var nowRadians = MillisToDrawRadians(nowDate.getTime(), 12.0);
-    
-    
+
+
     // Draw clock hand.
-    
+
     context.lineCap = 'round';
     context.save();
     context.translate(0, 2);
@@ -880,10 +880,10 @@ function Redraw()
     context.rotate(nowRadians);
     context.drawImage(gClockHand, -11.5, -48);
     context.restore();
-    
-    
+
+
     // Clean up.
-    
+
     context.restore();
 }
 
@@ -916,17 +916,17 @@ function WidgetWillRemove()
 function CityRequestHandler()
 {
     if (gCityRequest.readyState != 4 || gCityRequest.status != 200) return;
-    
+
     var results = gCityRequest.responseXML.getElementsByTagName('r');
     if (results.length == 0) return;
-    
+
     gPlaceName = results[0].getElementsByTagName('n')[0].firstChild.nodeValue;
     gLatitude  = results[0].getElementsByTagName('a')[0].firstChild.nodeValue;
     gLongitude = results[0].getElementsByTagName('o')[0].firstChild.nodeValue;
     var timeZone = results[0].getElementsByTagName('t')[0].firstChild.nodeValue;
-    
+
     window.TimeZoneHelper.setTimeZoneWithName(timeZone);
-    
+
     gStateName   = gLookupStateName;
     gCountryName = gLookupCountryName;
     gCountryCode = gLookupCountryCode;
@@ -939,10 +939,10 @@ function CityRequestHandler()
     widget.setPreferenceForKey(gLatitude,    widget.identifier + '-latitude');
     widget.setPreferenceForKey(gLongitude,   widget.identifier + '-longitude');
     widget.setPreferenceForKey(timeZone,     widget.identifier + '-timeZone');
-    
+
     document.getElementById('city').value = gPlaceName;
     SetText('placeName', gPlaceName);
-    
+
     Redraw();
 }
 
@@ -984,7 +984,7 @@ function FlipToBack()
 {
     var front = document.getElementById("front");
     var back  = document.getElementById("back");
-    
+
     if (gClockOnly)
     {
         document.getElementById('infoButton').style.display = 'none';
@@ -996,10 +996,10 @@ function FlipToBack()
     }
 
     widget.prepareForTransition("ToBack");
-    
+
     front.style.display = "none";
     back.style.display = "block";
-    
+
     SaveSettings();
     setTimeout("widget.performTransition(); document.getElementById('infoButton').style.display = 'block';", 0);
 }
@@ -1015,7 +1015,7 @@ function PerformLookupWith(name, state, countryName, countryCode, executeNow)
     gLookupStateName   = state;
     gLookupCountryName = countryName;
     gLookupCountryCode = countryCode;
-    
+
     var regionCode = countryCode;
     if (countryCode == 'US') regionCode += '/' + state;
 
@@ -1059,24 +1059,24 @@ function PerformLookupWith(name, state, countryName, countryCode, executeNow)
 function PerformLookup(executeNow)
 {
     // Save preferences.
-    
+
     var countryMenu = document.getElementById('country');
     var country = countryMenu.options[countryMenu.selectedIndex].value;
     widget.setPreferenceForKey(country, widget.identifier + '-selectedRegion');
-    
+
     if (country == 'US')
     {
         var state = document.getElementById('state').options[document.getElementById('state').selectedIndex].value
         widget.setPreferenceForKey(state, widget.identifier + '-selectedState');
     }
-    
+
     var name = document.getElementById('city').value;
     widget.setPreferenceForKey(name, widget.identifier + '-selectedName');
-    
+
     var twilightZenith = document.getElementById('twilight').value;
     widget.setPreferenceForKey(twilightZenith, widget.identifier + '-twilightZenith');
-    
-    
+
+
     if (gSavedSettings.country != document.getElementById('country').value
         || gSavedSettings.state != document.getElementById('state').value
         || gSavedSettings.city != document.getElementById('city').value)
@@ -1096,17 +1096,17 @@ function PerformLookup(executeNow)
 function FlipToFront(discardChanges)
 {
     if (!discardChanges) PerformLookup();
-    
+
     // Flip over.
-    
+
     var front = document.getElementById("front");
     var back  = document.getElementById("back");
-    
+
     widget.prepareForTransition("ToFront");
-    
+
     back.style.display = "none";
     front.style.display = "block";
-    
+
     if (gClockOnly)
         window.resizeTo(149, window.innerHeight);
     else if (gBackSizeAdjust)
@@ -1124,18 +1124,18 @@ function FlipToFront(discardChanges)
 function ToggleClockOnly()
 {
     // Toggle preference.
-    
+
     gClockOnly = !gClockOnly;
     widget.setPreferenceForKey(gClockOnly, widget.identifier + '-clockOnly');
-    
-    
+
+
     // Hide info button, otherwise it gets flickery.
-    
+
     document.getElementById('infoButton').style.display = 'none';
-    
-    
+
+
     // Determine target width and increment, and hide some elements.
-    
+
     if (gClockOnly)
     {
         document.getElementById('tableWrapper').style.display = 'none';
@@ -1148,10 +1148,10 @@ function ToggleClockOnly()
         target = gExpandedWidth;
         increment = 15;
     }
-    
-    
+
+
     // Animate size change.
-    
+
     for (width = window.innerWidth; increment < 0 ? (width > target) : (width < target); width += increment)
     {
         window.resizeBy(increment, 0);
@@ -1159,23 +1159,23 @@ function ToggleClockOnly()
         document.getElementById('bgRight').style.left = String(width - 19) + 'px';
         document.getElementById('placeName').style.width = String(width - 48) + 'px';
     }
-    
-    
+
+
     // Make sure width matches target.
-    
+
     window.resizeTo(target, window.innerHeight);
     document.getElementById('bgCenter').style.width = String(target - 149) + 'px';
     document.getElementById('bgRight').style.left = String(target - 19) + 'px';
     document.getElementById('placeName').style.width = String(target - 48) + 'px';
-    
-    
+
+
     // Show and hide some elements.
-    
+
     if (gClockOnly)
         document.getElementById('bandAid').style.display = 'block';
     else
         document.getElementById('tableWrapper').style.display = 'table';
-        
+
     document.getElementById('infoButton').style.display = 'block';
     TwilightDidChange();
 }
@@ -1216,17 +1216,17 @@ function WidgetForceShow()
 //
 var gLoaded = false;
 function WidgetDidLoad()
-{   
+{
     // Do any locale-specific initialization that might need to be performed.
     // (In particular, the German and Dutch localizations need to widen the window.)
-    
+
     gBackSizeAdjust = 0;
     if (window.LocaleInit) LocaleInit();
     gExpandedWidth = window.innerWidth;
-    
-    
+
+
     // Create buttons for flipping.
-    
+
     gDoneButton      = new AppleGlassButton(
                                 document.getElementById("doneButton"),
                                 LocalizedStringForKey("Done"),
@@ -1238,10 +1238,10 @@ function WidgetDidLoad()
                                 "white",
                                 "white",
                                 function (){FlipToBack();});
-    
-    
+
+
     // Insert localized strings into HTML.
-    
+
     SetText('dawnLabel',          LocalizedStringForKey('Dawn'));
     SetText('sunriseLabel',       LocalizedStringForKey('Sunrise'));
     SetText('sunsetLabel',        LocalizedStringForKey('Sunset'));
@@ -1251,18 +1251,18 @@ function WidgetDidLoad()
     SetText('cityLabel',          LocalizedStringForKey('City:'));
     //SetText('byLabel',          LocalizedStringForKey('by'));
     SetText('aboutLabel',         LocalizedStringForKey('About'));
-    
+
     SetText('twilightLabel',      LocalizedStringForKey('Twilight:'));
     SetText('civilOption',        LocalizedStringForKey('Civil'));
     SetText('nauticalOption',     LocalizedStringForKey('Nautical'));
     SetText('astronomicalOption', LocalizedStringForKey('Astronomical'));
 
     SetTextTitle('mapIcon',       LocalizedStringForKey('Show location on map'));
-    
+
     // Collapse if necessary.
-    
+
     gClockOnly = widget.preferenceForKey(widget.identifier + '-clockOnly');
-    
+
     if (gClockOnly)
     {
         document.getElementById('bandAid').style.display = 'block';
@@ -1272,15 +1272,15 @@ function WidgetDidLoad()
         document.getElementById('bgRight').style.left = '130px';
         document.getElementById('placeName').style.width = '101px';
     }
-    
-    
+
+
     // Get location and time zone from preferences, or set to default.
-    
+
     gPlaceName = widget.preferenceForKey(widget.identifier + '-name');
     var myCity = null;
     var myRegion = null;
     var myState = null;
-    
+
     if (gPlaceName)
     {
         gLatitude    = widget.preferenceForKey(widget.identifier + '-latitude');
@@ -1312,13 +1312,13 @@ function WidgetDidLoad()
         gCountryName = 'United States';
         gCountryCode = 'US';
         window.TimeZoneHelper.setTimeZoneWithName('US/Pacific');
-        
+
         myCity   = window.TimeZoneHelper.myCityName();
         myRegion = window.TimeZoneHelper.myRegionCode();
     }
-    
+
     SetText('placeName', gPlaceName);
-    
+
     if (myCity && myRegion)
     {
         if (myRegion.slice(0, 2) == 'US')
@@ -1326,7 +1326,7 @@ function WidgetDidLoad()
             myState = myRegion.slice(3);
             myRegion = 'US';
         }
-        
+
         var countryMenu = document.getElementById('country');
         countryMenu.value = myRegion;
         CountryDidChange();
@@ -1335,21 +1335,21 @@ function WidgetDidLoad()
         var regionName = countryMenu.options[countryMenu.selectedIndex].text;
         PerformLookupWith(myCity, myState, regionName, myRegion);
     }
-    
-    
+
+
     // Set displayed preferences.
-    
+
     var selectedRegion = widget.preferenceForKey(widget.identifier + '-selectedRegion');
     var selectedState  = widget.preferenceForKey(widget.identifier + '-selectedState');
     var selectedCity   = widget.preferenceForKey(widget.identifier + '-selectedName');
     var twilightZenith = widget.preferenceForKey(widget.identifier + '-twilightZenith');
-    
+
     if (selectedRegion)
     {
         document.getElementById('country').value  = selectedRegion;
         CountryDidChange();
     }
-    
+
     if (selectedState)  document.getElementById('state').value    = selectedState;
     if (selectedCity)   document.getElementById('city').value     = selectedCity;
 
