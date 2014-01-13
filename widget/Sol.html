@@ -52,29 +52,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <img id="bandAid"  src="BandAid.png"          alt="" />
             <span id="middayLine"                          ></span>
 
-            <canvas id="clock" height="100" width="100" onclick="ToggleClockOnly();"></canvas>
-
-            <div id="tableWrapper">
-                <table id="mainTable">
+            <div id="container">
+                <table id="containerTable">
                     <tr>
-                        <th id="dawnLabel"></th>
-                        <td id="morningTwilightCell"></td>
-                    </tr>
-                    <tr>
-                        <th id="sunriseLabel"></th>
-                        <td id="sunriseCell"></td>
-                    </tr>
-                    <tr>
-                        <td id="middayLabel">&nbsp;</td>
-                        <td id="middayCell"></td>
-                    </tr>
-                    <tr>
-                        <th id="sunsetLabel"></th>
-                        <td id="sunsetCell"></td>
-                    </tr>
-                    <tr>
-                        <th id="duskLabel"></th>
-                        <td id="eveningTwilightCell"></td>
+                        <td id="clockCell">
+                            <canvas id="clock" height="100" width="100" onclick="ToggleClockOnly();"></canvas>
+                        </td>
+                        <td id="tableWrapperCell">
+                            <div id="tableWrapper">
+                                <table id="mainTable">
+                                    <tr>
+                                        <th id="dawnLabel"></th>
+                                        <td id="morningTwilightCell"></td>
+                                    </tr>
+                                    <tr>
+                                        <th id="sunriseLabel"></th>
+                                        <td id="sunriseCell"></td>
+                                    </tr>
+                                    <tr>
+                                        <td id="middayLabel">&nbsp;</td>
+                                        <td id="middayCell"></td>
+                                    </tr>
+                                    <tr>
+                                        <th id="sunsetLabel"></th>
+                                        <td id="sunsetCell"></td>
+                                    </tr>
+                                    <tr>
+                                        <th id="duskLabel"></th>
+                                        <td id="eveningTwilightCell"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
                     </tr>
                 </table>
             </div>
@@ -84,6 +93,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <div id="placeName"></div>
 
             <div id="infoButton"></div>
+
         </div>
 
 
@@ -414,12 +424,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 </tr>
             </table>
 
-            <div id="about">
-                <span onclick="PerformLookup(true); widget.openURL(mapURL());" class="ctrl link"><img id="mapIcon" src="gm.png" alt="" /></span>
-                <span onclick="widget.openURL(aboutURL());" class="ctrl link"><span id="aboutLabel"></span></span>
-                Sol <script type="text/javascript">document.write(gVersion);</script>
+            <div id="hideforflip">
+                <div id="about">
+                    <span onclick="PerformLookup(true); widget.openURL(mapURL());" class="ctrl link"><img id="mapIcon" src="gm.png" alt="" /></span>
+                    <span onclick="widget.openURL(aboutURL());" class="ctrl link"><span id="aboutLabel"></span></span>
+                    Sol <script type="text/javascript">document.write(gVersion);</script>
+                </div>
+                <div id="doneButton"></div>
             </div>
-            <div id="doneButton"></div>
         </div>
 
 

@@ -89,6 +89,22 @@ body
     height: 166px;
 }
 
+#container
+{
+    width: 224px;
+    overflow: hidden;
+}
+
+#containerTable
+{
+    border-spacing: 0;
+}
+
+#clockCell
+{
+    padding: 0;
+}
+
 #tableWrapper
 {
     display: table;
@@ -99,6 +115,7 @@ body
 {
     margin-left: auto;
     margin-right: auto;
+    white-space: nowrap;
 }
 
 #mainTable th

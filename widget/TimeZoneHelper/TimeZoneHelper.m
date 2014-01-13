@@ -233,11 +233,6 @@ static int compare_city(const void *p1, const void *p2)
 
     [formatter release];
 
-    // This hack prevents layout issues when a German-speaking user has "Uhr" on the end of their time format.
-
-    if ([formattedTime hasSuffix:@" Uhr"])
-        formattedTime = [formattedTime substringToIndex:[formattedTime length] - 4];
-
     return formattedTime;
 }
 

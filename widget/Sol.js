@@ -65,6 +65,7 @@ var gWhiteInfoButton;
 
 var gClockOnly;
 var gExpandedWidth;
+var gExtraWidth;
 var gFrontSizeAdjust;
 var gBackSizeAdjust;
 var gFrontHeight = 163;
@@ -647,32 +648,41 @@ function AdjustClockMidday()
         document.getElementById('middayLine').style.display = 'none';
         document.getElementById('middayCell').style.display = 'none';
     }
-    else if (gShowMidday)
-    {
-        targetWidth = gExpandedWidth;
-        document.getElementById('tableWrapper').style.display = 'table';
-        document.getElementById('middayCell').style.display = 'table-cell';
-        document.getElementById('bandAid').style.width = String(gExpandedWidth - 137) + 'px';
-        document.getElementById('bandAid').style.height = '4px';
-        document.getElementById('bandAid').style.display = 'block';
-        var leftSide = document.getElementById('tableWrapper').offsetLeft +
-            Math.round((117 - document.getElementById('mainTable').offsetWidth) / 2);
-        var width = document.getElementById('middayLabel').offsetWidth;
-        document.getElementById('middayLine').style.left = String(leftSide) + 'px';
-        document.getElementById('middayLine').style.width = String(width) + 'px';
-        document.getElementById('middayLine').style.display = 'block';
-    }
     else
     {
         targetWidth = gExpandedWidth;
         document.getElementById('tableWrapper').style.display = 'table';
-        document.getElementById('bandAid').style.display = 'none';
-        document.getElementById('middayLine').style.display = 'none';
-        document.getElementById('middayCell').style.display = 'none';
+        document.getElementById('container').style.width = String(226 + gFrontSizeAdjust) + 'px';
+        var actualWidth = document.getElementById('tableWrapper').offsetWidth;
+        if (actualWidth > 117 + gFrontSizeAdjust)
+            gExtraWidth = actualWidth - (117 + gFrontSizeAdjust);
+        else
+            gExtraWidth = 0;
+        targetWidth += gExtraWidth;
+        document.getElementById('container').style.width = String(226 + gFrontSizeAdjust + gExtraWidth) + 'px';
+        if (gShowMidday)
+        {
+            document.getElementById('bandAid').style.width = String(gExpandedWidth + gExtraWidth - 137) + 'px';
+            document.getElementById('bandAid').style.height = '4px';
+            document.getElementById('bandAid').style.display = 'block';
+            var leftSide = document.getElementById('container').offsetLeft +
+                document.getElementById('tableWrapperCell').offsetLeft +
+                Math.round((117 + gFrontSizeAdjust + gExtraWidth - document.getElementById('mainTable').offsetWidth) / 2);
+            var width = document.getElementById('middayLabel').offsetWidth - 6;
+            document.getElementById('middayLine').style.left = String(leftSide + 5) + 'px';
+            document.getElementById('middayLine').style.width = String(width) + 'px';
+            document.getElementById('middayLine').style.display = 'block';
+        }
+        else
+        {
+            document.getElementById('bandAid').style.display = 'none';
+            document.getElementById('middayLine').style.display = 'none';
+            document.getElementById('middayCell').style.display = 'none';
+        }
     }
-    if (window.innerWidth != targetWidth || window.innerHeight != gExpandedWidth)
+    if (window.innerWidth != targetWidth || window.innerHeight != gFrontHeight || 1)
     {
-        if (!isBackSide())
+        if (1 || !isBackSide())
             window.resizeTo(targetWidth, gFrontHeight);
 
         // Make sure width matches target.
@@ -1113,13 +1123,14 @@ function FlipToBack()
 
     if (gClockOnly) {
         document.getElementById('infoButton').style.display = 'none';
-        window.resizeTo(gExpandedWidth, gFrontHeight);
+        window.resizeTo(gExpandedWidth + gExtraWidth, gFrontHeight);
     }
 
     widget.prepareForTransition("ToBack");
 
     front.style.display = "none";
     back.style.display = "block";
+    document.getElementById('hideforflip').style.display = "block";
 
     window.resizeTo(gExpandedWidth + gBackSizeAdjust, gBackHeight);
 
@@ -1225,15 +1236,21 @@ function FlipToFront(discardChanges)
     var front = document.getElementById("front");
     var back  = document.getElementById("back");
 
-    widget.prepareForTransition("ToFront");
+    if (!gClockOnly && gExpandedWidth + gExtraWidth > gExpandedWidth + gBackSizeAdjust)
+    {
+        document.getElementById('hideforflip').style.display = "none";
+        window.resizeTo(gExpandedWidth + gExtraWidth, gFrontHeight);
+    }
 
-    back.style.display = "none";
-    front.style.display = "block";
+    widget.prepareForTransition("ToFront");
 
     if (gClockOnly)
         window.resizeTo(149, gFrontHeight);
     else
-        window.resizeTo(gExpandedWidth, gFrontHeight);
+        window.resizeTo(gExpandedWidth + gExtraWidth, gFrontHeight);
+
+    back.style.display = "none";
+    front.style.display = "block";
 
     setTimeout("widget.performTransition(); WidgetDidShow();", 0);
 }
@@ -1337,6 +1354,7 @@ function WidgetDidLoad()
     gBackSizeAdjust = 0;
     if (window.LocaleInit) LocaleInit();
     gExpandedWidth = 272 + gFrontSizeAdjust;
+    gExtraWidth = 0;
 
 
     // Create buttons for flipping.
