@@ -48,11 +48,13 @@ var gLookupCountryCode;
 // Last valid lookup, Location and GMT offset of selected location.
 
 var gPlaceName;
+var gLocalizedName;
 var gStateName;
 var gCountryName;
 var gCountryCode;
 var gLatitude;
 var gLongitude;
+var gAutomatic;
 
 
 // Buttons... not actually used after instantiation.
@@ -139,6 +141,11 @@ function CountryDidChange()
         countryMenu.options[countryMenu.selectedIndex].value == 'US'
         ? 'table-row'
         : 'none';
+
+    document.getElementById('cityRow').style.display =
+        countryMenu.options[countryMenu.selectedIndex].value == '-'
+        ? 'none'
+        : 'table-row';
 }
 
 
@@ -709,6 +716,77 @@ function AdjustClockMidday()
 }
 
 
+// -- UpdateAutomaticLocation --
+//
+// If the Automatic mode is active, update the current location if
+// possible.
+//
+function UpdateAutomaticLocation()
+{
+    if (!gAutomatic)
+        return;
+
+    window.TimeZoneHelper.synchronizePreferences();
+    var myRegion    = window.TimeZoneHelper.myRegionCode();
+    var myCity      = window.TimeZoneHelper.myCityName();
+    var myLocCity   = window.TimeZoneHelper.myLocalizedCityName();
+    var myState     = null;
+    var myZone      = window.TimeZoneHelper.myTimeZone();
+    var myLatitude  = window.TimeZoneHelper.myLatitude();
+    var myLongitude = window.TimeZoneHelper.myLongitude();
+
+    if (myRegion && myCity)
+    {
+        if (myRegion.slice(0, 2) == 'US')
+        {
+            myState = myRegion.slice(3);
+            myRegion = 'US';
+        }
+    }
+
+    if (!myRegion || !myCity || !myZone || !myLatitude || !myLongitude)
+    {
+        myRegion     = 'US';
+        myState      = 'CA';
+        myCity       = 'Cupertino';
+        myLocCity    =  myCity;
+        myZone       = 'US/Pacific';
+        myLatitude   = 37.32306;
+        myLongitude  = -122.03111;
+    }
+
+    if (!myLocCity)
+        myLocCity = myCity;
+
+    var country = document.getElementById('country');
+    if (country.options[country.selectedIndex].value != '-')
+    {
+        country.value = '-';
+        CountryDidChange();
+    }
+    if (myState)
+    {
+        var state = document.getElementById('state');
+        if (state.options[country.selectedIndex].value != myState)
+            state.value = myState;
+    }
+    var city = document.getElementById('city');
+    if (city.value != myCity)
+        city.value = myCity;
+
+    gCountryName = 'Automatic';
+    gCountryCode = myRegion;
+    gStateName = myState;
+    gPlaceName = myCity;
+    gLocalizedName = myLocCity;
+    gLatitude = myLatitude;
+    gLongitude = myLongitude;
+    window.TimeZoneHelper.setTimeZoneWithName(myZone);
+
+    SetText('placeName', gLocalizedName);
+}
+
+
 // -- WidgetDidShow --
 //
 // Handles the onshow event for the widget. Redraws and starts periodic updates.
@@ -731,6 +809,7 @@ function WidgetDidShow()
         return;
     }
 
+    UpdateAutomaticLocation();
     Redraw();
     // The clock hand is 59 pixels long, this corresponds to a 1 pixel movement
     // at the end of the hand when it is rotated by an amount approximately
@@ -1175,6 +1254,7 @@ function WidgetWillRemove()
     widget.setPreferenceForKey(null, widget.identifier + '-latitude');
     widget.setPreferenceForKey(null, widget.identifier + '-longitude');
     widget.setPreferenceForKey(null, widget.identifier + '-name');
+    widget.setPreferenceForKey(null, widget.identifier + '-localizedName');
     widget.setPreferenceForKey(null, widget.identifier + '-state');
     widget.setPreferenceForKey(null, widget.identifier + '-country');
     widget.setPreferenceForKey(null, widget.identifier + '-countryCode');
@@ -1186,6 +1266,7 @@ function WidgetWillRemove()
     widget.setPreferenceForKey(null, widget.identifier + '-showMidday');
     widget.setPreferenceForKey(null, widget.identifier + '-useUTC');
     widget.setPreferenceForKey(null, widget.identifier + '-showNumbers');
+    widget.setPreferenceForKey(null, widget.identifier + '-automatic');
 }
 
 
@@ -1201,6 +1282,7 @@ function CityRequestHandler()
     if (results.length == 0) return;
 
     gPlaceName = results[0].getElementsByTagName('n')[0].firstChild.nodeValue;
+    gLocalizedName = gPlaceName;
     gLatitude  = results[0].getElementsByTagName('a')[0].firstChild.nodeValue;
     gLongitude = results[0].getElementsByTagName('o')[0].firstChild.nodeValue;
     var timeZone = results[0].getElementsByTagName('t')[0].firstChild.nodeValue;
@@ -1210,8 +1292,10 @@ function CityRequestHandler()
     gStateName   = gLookupStateName;
     gCountryName = gLookupCountryName;
     gCountryCode = gLookupCountryCode;
+    gAutomatic   = false;
 
     widget.setPreferenceForKey(gPlaceName,   widget.identifier + '-name');
+    widget.setPreferenceForKey(null,         widget.identifier + '-localizedName');
     widget.setPreferenceForKey(gPlaceName,   widget.identifier + '-selectedName');
     widget.setPreferenceForKey(gStateName,   widget.identifier + '-state');
     widget.setPreferenceForKey(gCountryName, widget.identifier + '-country');
@@ -1219,6 +1303,7 @@ function CityRequestHandler()
     widget.setPreferenceForKey(gLatitude,    widget.identifier + '-latitude');
     widget.setPreferenceForKey(gLongitude,   widget.identifier + '-longitude');
     widget.setPreferenceForKey(timeZone,     widget.identifier + '-timeZone');
+    widget.setPreferenceForKey(gAutomatic,   widget.identifier + '-automatic');
 
     document.getElementById('city').value = gPlaceName;
     SetText('placeName', gPlaceName);
@@ -1382,7 +1467,21 @@ function PerformLookup(executeNow)
 //
 function FlipToFront(discardChanges)
 {
-    if (!discardChanges) PerformLookup();
+    if (!discardChanges)
+    {
+        var country = document.getElementById('country');
+        if (country.options[country.selectedIndex].value == '-')
+        {
+            gAutomatic = true;
+            widget.setPreferenceForKey(gAutomatic, widget.identifier + '-automatic');
+            UpdateAutomaticLocation();
+        }
+        else
+        {
+            PerformLookup();
+        }
+
+    }
 
     // Flip over.
 
@@ -1556,15 +1655,15 @@ function WidgetDidLoad()
     gShowClockNumbers = widget.preferenceForKey(widget.identifier + '-showNumbers');
     document.getElementById('numbers').checked = gShowClockNumbers ? true : false;
 
-
     // Get location and time zone from preferences, or set to default.
 
     gPlaceName = widget.preferenceForKey(widget.identifier + '-name');
-    var myCity = null;
-    var myRegion = null;
-    var myState = null;
+    gLocalizedName = widget.preferenceForKey(widget.identifier + '-localizedName');
+    if (gPlaceName && !gLocalizedName)
+        gLocalizedName = gPlaceName;
+    gAutomatic = widget.preferenceForKey(widget.identifier + '-automatic') ? true : false;
 
-    if (gPlaceName)
+    if (gPlaceName && !gAutomatic)
     {
         gLatitude    = widget.preferenceForKey(widget.identifier + '-latitude');
         gLongitude   = widget.preferenceForKey(widget.identifier + '-longitude');
@@ -1585,57 +1684,36 @@ function WidgetDidLoad()
             countryMenu.value = gCountryCode;
             gCountryName = countryMenu.options[countryMenu.selectedIndex].text;
         }
+
+        SetText('placeName', gPlaceName);
     }
     else
     {
-        gPlaceName   = 'Cupertino';
-        gLatitude    =   37.32306;
-        gLongitude   = -122.03111;
-        gStateName   = 'CA';
-        gCountryName = 'United States';
-        gCountryCode = 'US';
-        window.TimeZoneHelper.setTimeZoneWithName('US/Pacific');
-
-        myCity   = window.TimeZoneHelper.myCityName();
-        myRegion = window.TimeZoneHelper.myRegionCode();
+        gAutomatic = true;
+        widget.setPreferenceForKey(gAutomatic, widget.identifier + '-automatic');
+        message("WidgetDidLoad activated gAutomatic");
+        UpdateAutomaticLocation();
     }
-
-    SetText('placeName', gPlaceName);
-
-    if (myCity && myRegion)
-    {
-        if (myRegion.slice(0, 2) == 'US')
-        {
-            myState = myRegion.slice(3);
-            myRegion = 'US';
-        }
-
-        var countryMenu = document.getElementById('country');
-        countryMenu.value = myRegion;
-        CountryDidChange();
-        if (myState) document.getElementById('state').value = myState;
-        document.getElementById('city').value = myCity;
-        var regionName = countryMenu.options[countryMenu.selectedIndex].text;
-        PerformLookupWith(myCity, myState, regionName, myRegion);
-    }
-
 
     // Set displayed preferences.
 
-    var selectedRegion = widget.preferenceForKey(widget.identifier + '-selectedRegion');
-    var selectedState  = widget.preferenceForKey(widget.identifier + '-selectedState');
-    var selectedCity   = widget.preferenceForKey(widget.identifier + '-selectedName');
-    var twilightZenith = widget.preferenceForKey(widget.identifier + '-twilightZenith');
-
-    if (selectedRegion)
+    if (!gAutomatic)
     {
-        document.getElementById('country').value  = selectedRegion;
-        CountryDidChange();
+        var selectedRegion = widget.preferenceForKey(widget.identifier + '-selectedRegion');
+        var selectedState  = widget.preferenceForKey(widget.identifier + '-selectedState');
+        var selectedCity   = widget.preferenceForKey(widget.identifier + '-selectedName');
+
+        if (selectedRegion)
+        {
+            document.getElementById('country').value  = selectedRegion;
+            CountryDidChange();
+        }
+
+        if (selectedState)  document.getElementById('state').value    = selectedState;
+        if (selectedCity)   document.getElementById('city').value     = selectedCity;
     }
 
-    if (selectedState)  document.getElementById('state').value    = selectedState;
-    if (selectedCity)   document.getElementById('city').value     = selectedCity;
-
+    var twilightZenith = widget.preferenceForKey(widget.identifier + '-twilightZenith');
     if (twilightZenith)
     {
         document.getElementById('twilight').value = twilightZenith;
@@ -1651,6 +1729,7 @@ function WidgetDidLoad()
     // may never be sent when a widget is forcibly reloaded with Cmd-R
     setTimeout('WidgetForceShow();', 500);
 }
+
 
 // -- aboutURL --
 //
@@ -1677,6 +1756,13 @@ function getLocationName()
     }
     else
     {
+        if (gCountryName == 'Automatic')
+        {
+            var countryMenu = document.getElementById('country');
+            countryMenu.value = gCountryCode;
+            gCountryName = countryMenu.options[countryMenu.selectedIndex].text;
+            countryMenu.value = '-';
+        }
         return gPlaceName + ', ' + gCountryName;
     }
 }

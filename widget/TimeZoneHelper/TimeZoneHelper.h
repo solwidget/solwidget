@@ -58,6 +58,10 @@
 
 - (NSString *)myRegionCode;
 - (NSString *)myCityName;
+- (NSString *)myLocalizedCityName;
+- (NSString *)myTimeZone;
+- (double)myLatitude;
+- (double)myLongitude;
 
 - (void)log:(NSString *)msg;
 

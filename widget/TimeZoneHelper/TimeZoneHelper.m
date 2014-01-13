@@ -42,6 +42,20 @@
 
 @implementation TimeZoneHelper
 
+#define NEW_KEY @"com.apple.preferences.timezone.selected_city"
+#define OLD_KEY @"com.apple.TimeZonePref.Last_Selected_City"
+
+enum DatumKind {
+    Datum_CountryCode,    /* NSString */
+    Datum_StateCode,      /* NSString */
+    Datum_RegionCode,     /* NSString */
+    Datum_CityName,       /* NSString */
+    Datum_CityLocName,    /* NSString */
+    Datum_TimeZoneName,   /* NSString */
+    Datum_Latitude,       /* NSNumber */
+    Datum_Longitude       /* NSNumber */
+};
+
 typedef struct city_entry_s {
     const NSString *selected_city;
     const NSString *selected_country;
@@ -70,13 +84,10 @@ static int compare_city(const void *p1, const void *p2)
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (const city_entry_t *)lastSelectedCity
+static const city_entry_t *lookupOldCity(NSArray *selectedCityPref)
 {
     city_entry_t search, *found;
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    NSArray *selectedCityPref =
-        [[NSUserDefaults standardUserDefaults]
-            arrayForKey: @"com.apple.TimeZonePref.Last_Selected_City"];
     if (!selectedCityPref)
     {
         [pool drain];
@@ -100,6 +111,146 @@ static int compare_city(const void *p1, const void *p2)
         sizeof(city_entry_t), compare_city);
     [pool drain];
     return found;
+}
+
+static NSString *stringForKey(NSDictionary *d, NSString *k)
+{
+    id value;
+    if (!d || !k)
+        return nil;
+    value = [d objectForKey: k];
+    return value && [value isKindOfClass: [NSString class]] ? value : nil;
+}
+
+static NSString *stringForIndex(NSArray *a, unsigned i)
+{
+    id value;
+    if (!a)
+        return nil;
+    value = i < [a count] ? [a objectAtIndex: i] : nil;
+    return value && [value isKindOfClass: [NSString class]] ? value : nil;
+}
+
+static NSNumber *numberForKey(NSDictionary *d, NSString *k)
+{
+    id value;
+    if (!d || !k)
+        return nil;
+    value = [d objectForKey: k];
+    return value && [value isKindOfClass: [NSNumber class]] ? value : nil;
+}
+
+static NSString *GetLocalizedCity(NSDictionary *p)
+{
+    NSArray *langs = [[NSUserDefaults standardUserDefaults] arrayForKey: @"AppleLanguages"];
+    NSDictionary *names = (NSDictionary *)[p objectForKey: @"LocalizedNames"];
+    unsigned i, lcount;
+    if (!langs || !names || ![names isKindOfClass: [NSDictionary class]])
+        return nil;
+    lcount = [langs count];
+    for (i = 0; i < lcount; ++i) {
+        NSString *ans, *lang = stringForIndex(langs, i);
+        if (!lang) continue;
+        ans = stringForKey(names, lang);
+        if (ans)
+            return ans;
+    }
+    return nil;
+}
+
+- (id)selectedDatum: (enum DatumKind)kind
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *newDict = [defaults dictionaryForKey: NEW_KEY];
+    NSArray *oldArray = newDict ? nil : [defaults arrayForKey: OLD_KEY];
+    const city_entry_t *xlate = NULL;
+
+    if (!newDict && !oldArray)
+        return nil;
+
+    if (newDict) {
+        if (![newDict isKindOfClass: [NSDictionary class]])
+            return nil;
+    } else {
+        if (![oldArray isKindOfClass: [NSArray class]])
+            return nil;
+        xlate = lookupOldCity(oldArray);
+        if (!xlate)
+            return nil;
+    }
+
+    switch(kind) {
+
+    case Datum_CountryCode:
+        if (newDict) {
+            return stringForKey(newDict, @"CountryCode");
+        } else {
+            if ([xlate->db_region hasPrefix: @"US/"])
+                return @"US";
+            else
+                return xlate->db_region;
+        }
+
+    case Datum_StateCode:
+    {
+        NSString *country = [self selectedDatum: Datum_CountryCode];
+        if (!country || ![country isEqualToString: @"US"])
+            return nil;
+        if (newDict)
+            return stringForKey(newDict, @"RegionalCode");
+        if (![xlate->db_region hasPrefix: @"US/"])
+            return nil;
+        return [xlate->db_region substringFromIndex: 3];
+    }
+
+    case Datum_RegionCode:
+        if (newDict) {
+            NSString *country = [self selectedDatum: Datum_CountryCode];
+            NSString *state;
+            if (!country || ![country isEqualToString: @"US"])
+                return country;
+            state = [self selectedDatum: Datum_StateCode];
+            if (!state)
+                return country;
+            return [NSString stringWithFormat: @"%@/%@", country, state];
+        } else {
+            return xlate->db_region;
+        }
+
+    case Datum_CityName:
+        return newDict ? stringForKey(newDict, @"Name") : xlate->db_city;
+
+    case Datum_CityLocName:
+        return newDict ? GetLocalizedCity(newDict) : stringForIndex(oldArray, 7);
+
+    case Datum_TimeZoneName:
+        return newDict ? stringForKey(newDict, @"TimeZoneName") : stringForIndex(oldArray, 3);
+
+    case Datum_Latitude:
+    {
+        NSString *num;
+        if (newDict)
+            return numberForKey(newDict, @"Latitude");
+        num = stringForIndex(oldArray, 0);
+        if (!num)
+            return nil;
+        return [NSNumber numberWithDouble: [num doubleValue]];
+    }
+
+    case Datum_Longitude:
+    {
+        NSString *num;
+        if (newDict)
+            return numberForKey(newDict, @"Longitude");
+        num = stringForIndex(oldArray, 1);
+        if (!num)
+            return nil;
+        return [NSNumber numberWithDouble: [num doubleValue]];
+    }
+
+    default:
+        return nil;
+    }
 }
 
 - (id)initWithWebView:(WebView *)webview
@@ -185,7 +336,15 @@ static int compare_city(const void *p1, const void *p2)
         return NO;
     if (aSelector == @selector(myCityName))
         return NO;
+    if (aSelector == @selector(myLatitude))
+        return NO;
+    if (aSelector == @selector(myLocalizedCityName))
+        return NO;
+    if (aSelector == @selector(myLongitude))
+        return NO;
     if (aSelector == @selector(myRegionCode))
+        return NO;
+    if (aSelector == @selector(myTimeZone))
         return NO;
     if (aSelector == @selector(setTimeZoneWithName:))
         return NO;
@@ -270,16 +429,34 @@ static int compare_city(const void *p1, const void *p2)
 
 - (NSString *)myRegionCode
 {
-    const city_entry_t *lastCity = [self lastSelectedCity];
-    if (lastCity) return (NSString *)lastCity->db_region;
-    return nil;
+    return (NSString *)[self selectedDatum: Datum_RegionCode];
 }
 
 - (NSString *)myCityName
 {
-    const city_entry_t *lastCity = [self lastSelectedCity];
-    if (lastCity) return (NSString *)lastCity->db_city;
-    return nil;
+    return (NSString *)[self selectedDatum: Datum_CityName];
+}
+
+- (NSString *)myLocalizedCityName
+{
+    return (NSString *)[self selectedDatum: Datum_CityLocName];
+}
+
+- (NSString *)myTimeZone
+{
+    return (NSString *)[self selectedDatum: Datum_TimeZoneName];
+}
+
+- (double)myLatitude
+{
+    NSNumber *num = (NSNumber *)[self selectedDatum: Datum_Latitude];
+    return num ? [num doubleValue] : 0.0;
+}
+
+- (double)myLongitude
+{
+    NSNumber *num = (NSNumber *)[self selectedDatum: Datum_Longitude];
+    return num ? [num doubleValue] : 0.0;
 }
 
 - (NSString *)lookupPlaceInRegion:(NSString *)region withName:(NSString *)name
