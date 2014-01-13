@@ -1,8 +1,18 @@
 ﻿
-1.3.4 (Changes since 1.3.3) 2013-??-??
+1.3.4 (Changes since 1.3.3) 2014-01-13
 
 - Add ReadMe.rtf
-- Fix incorrect twilight display at extreme latitudes
+- Fix issue #10: incorrect twilight display at extreme latitudes
+- Fix occasional failure to draw during initial load (especially if multiple copies)
+- City abbreviations for longer city names can no longer hide same-named different cities
+- Fix issue #11: Correct database latitude and longitude values for Toulouse, FR
+- Fix an widget reload display issue when already collapsed
+- Remove 'Uhr' hack and accommodate any length short time format
+- No more "Dashboard wants to access your Contacts" dialogs on 10.8+
+- New option to show the mid day time (i.e. "high noon")
+- New option to show the digital times in UTC
+- New option to show numbers on the analog clock face to better read the time
+- New "Automatic" mode to automatically follow changes to the time zone city (issue #4)
 
 
 1.3.3 (Changes since 1.3.2) 2011-11-11
