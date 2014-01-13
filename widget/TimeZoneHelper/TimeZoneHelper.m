@@ -70,6 +70,11 @@ static int compare_city(const void *p1, const void *p2)
                                              (NSString *)e2->selected_country];
 }
 
+- (void)synchronizePreferences
+{
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (const city_entry_t *)lastSelectedCity
 {
     city_entry_t search, *found;
@@ -188,6 +193,8 @@ static int compare_city(const void *p1, const void *p2)
     if (aSelector == @selector(myRegionCode))
         return NO;
     if (aSelector == @selector(setTimeZoneWithName:))
+        return NO;
+    if (aSelector == @selector(synchronizePreferences))
         return NO;
     if (aSelector == @selector(timeOffsetMillisForDate:))
         return NO;

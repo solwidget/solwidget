@@ -698,7 +698,7 @@ function AdjustClockMidday()
     }
     if (window.innerWidth != targetWidth || window.innerHeight != gFrontHeight || 1)
     {
-        if (1 || !isBackSide())
+        if (!isBackSide())
             window.resizeTo(targetWidth, gFrontHeight);
 
         // Make sure width matches target.
@@ -738,6 +738,18 @@ function WidgetDidShow()
     // anti-aliasing is being used to draw the hand) which is just under two
     // minutes.
     gClockTimeout = setTimeout('WidgetDidShow();', 116000);
+}
+
+
+// -- WidgetDidSync --
+//
+// Handles the onsync event for the widget.
+// Simply synchronizes preferences and then calls WidgetDidShow
+//
+function WidgetDidSync()
+{
+    window.TimeZoneHelper.synchronizePreferences();
+    WidgetDidShow();
 }
 
 
@@ -1461,6 +1473,7 @@ if (window.widget) {
     widget.onshow   = WidgetDidShow;
     widget.onhide   = WidgetDidHide;
     widget.onremove = WidgetWillRemove;
+    widget.onsync   = WidgetDidSync;
 }
 
 
