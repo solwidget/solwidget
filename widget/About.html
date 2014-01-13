@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
 Sol Widget About.html Page
-Copyright (C) 2010,2011,2012 Kyle J. McKay
+Copyright (C) 2010,2011,2012,2014 Kyle J. McKay
 Portions Copyright (C) 2006 Daniel S. Neumeyer
 All rights reserved
 
@@ -28,7 +28,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>About Sol</title>
@@ -106,12 +106,20 @@ pre {
   display: inline-block;
   font-size: 60%;
 }
-h1,h2,h3,h4,h5,h6,.summary,#appleRequiredText,#copyright,.note {
+h1,h2,h3,h4,h5,h6,.summary,#appleRequiredText,#copyright,.note,li {
   font-family: Helvetica, Arial, sans-serif;
   font-weight: normal;
 }
 .note {
   font-size: 95%;
+}
+.detail {
+  font-family: Times, Times New Roman, serif;
+  display: block;
+  margin-top: 0;
+  padding-top: 0.25em;
+  padding-bottom: 0.75em;
+  font-size: 85%;
 }
 h1,h2,h3,h4,h5,h6 {
   border-bottom: thin solid gray;
@@ -211,6 +219,7 @@ function HideDK()
 <i>Table of Contents</i><br /><span>
 <a href="#About"       >About</a><br />
 <a href="#Download"    >Download</a><br />
+<a href="#Help"        >Help</a><br />
 <a href="#History"     >History</a><br />
 <a href="#Rebirth"     >Rebirth</a><br />
 <a href="#Database"    >The Places Database</a><br />
@@ -234,9 +243,20 @@ Sol is a Dashboard widget that tells you what time sunrise and sunset are, as we
 <a href="http://solwidget.googlecode.com/files/Sol-1.3.4.wdgt.zip"><img src="Icon.png" width="75" height="75" /></a><br />
 <a href="http://solwidget.googlecode.com/files/Sol-1.3.4.wdgt.zip">Sol-1.3.4.wdgt.zip</a><span class="fakesuper"><span><span><a href="#appleRequiredText">&#x274b;</a></span></span></span>
 </div>
-<p style="margin-top:0.5em">The most current version of Sol can always be found on <a href="http://code.google.com/p/solwidget/downloads">the Sol widget project’s downloads page</a>.</p>
+<p style="margin-top:0.5em">The most current version of Sol can always be found on <a href="http://code.google.com/p/solwidget/">the Sol widget project’s page</a>.</p>
 
-<p><span class="note">NOTE:  </span>Since the listing for Sol on the <a href="http://www.apple.com/downloads/dashboard/">Apple Dashboard Widgets</a> directory (Sol is found in the <em>Information</em> category) is now permanently stuck pointing to the Sol 1.3.1 download (updates for the directory stopped being accepted shortly after the Mac App Store was released), the Sol 1.3.1 download will actually always be updated to contain the most recent version despite its download name until such time as the Apple Dashboard Widgets directory starts accepting updates again or just goes away entirely.</p>
+<p><span class="note">NOTE:  </span>Since the listing for Sol on the <a href="http://www.apple.com/downloads/dashboard/">Apple Dashboard Widgets</a> directory (Sol is found in the <em>Information</em> category) is now permanently stuck pointing to the Sol 1.3.1 download (updates for the directory stopped being accepted shortly after the Mac App Store was released), the Sol 1.3.1 download has, in the past, been kept updated to the most recent Sol release.  Now, however, that download is permanently stuck at version 1.3.4 since <a href="http://google-opensource.blogspot.com/2013/05/a-change-to-google-code-download-service.html">Google disabled creating new downloads as of 2014-01-15</a>.</p>
+
+<h2 id="Help">Sol Help</h2>
+<p>Most all of the Sol widget settings should be either obvious or easily tried out to see what they do.  However there are two items that could stand some more explanation:</p>
+<ol>
+<li>“Automatic” Mode<br />
+<span class="detail">When a new copy of the Sol widget is added to the Dashboard, it will initially be in “Automatic” mode.  This simply means that the location it displays will automatically follow changes to the time zone city as set in System Preferences.  This can be changed by using the back side of the Sol widget and setting the “Country:” value to something other than “Automatic”.</span>
+</li>
+<li>Digital Time Format<br />
+<span class="detail">The digital times and the optional numbers around the edge of the analog clock face displayed on the front of the Sol widget are affected by the System Preferences setting for the “Short” time format.  If the “Short” time format displays times in 24 hour format then so will the Sol widget.  If the “Short” time format includes seconds, then so too will the Sol widget display them.  In other words, to change the format of the digital times shown on the front of the Sol widget, use System Preferences to adjust the “Short” time format setting.</span>
+</li>
+</ol>
 
 <h2 id="History">History</h2>
 
@@ -266,6 +286,7 @@ Internet Archive at <a href="http://web.archive.org/web/20090726101203/http://ca
 </p>
 
 <p>And, for the final nail in the coffin, Snow Leopard (10.6) was released in the second half of 2009.  Because the Sol widget contains some helper code that was never compiled as 64-bit (required for Snow Leopard widgets running on 64-bit processors), the helper portion of the widget would not operate under Snow Leopard on 64-bit processors.
+</p>
 
 <h2 id="Rebirth">Rebirth</h2>
 
@@ -293,6 +314,7 @@ This was all the more surprising to me because I still had several copies of the
 </p>
 
 <p>So at this point I started digging into the Sol source code that I had stored away two years ago and began the process of figuring out why it wasn&#x2019;t working anymore.
+</p>
 
 <h2 id="Database">The Places Database</h2>
 
@@ -327,14 +349,17 @@ It turns out it&#x2019;s possible to shave about another 3 megabytes off the dat
 <h2 id="Home">Source Code</h2>
 
 <p>The current version of the Sol widget is now hosted at <a href="http://code.google.com/p/solwidget/" target="_blank"><span class="link">http://code.google.com/p/solwidget/</span></a> with both source and binaries available for download (the new Apple Dashboard Widgets directory entry for the Sol widget now points there).
+</p>
 
 <h2 id="Requirements">System Requirements</h2>
 
-<p>The current version of the Sol widget is compatible with Mac OS X 10.4.3 and later including both PPC and Intel processors (including 64-bit processors) and Leopard 10.5.x and Snow Leopard 10.6.x and Lion 10.7.x and is distributed in a single Universal Binary format that works on all supported systems.
+<p>The current version of the Sol widget is compatible with Mac OS X 10.4.3 and later including both PowerPC and Intel processors (including both 32-bit and 64-bit processors).  It runs on Tiger 10.4.x, Leopard 10.5.x, Snow Leopard 10.6.x, Lion 10.7,x, Mountain Lion 10.8.x and Mavericks 10.9.x (and likely future releases).  Sol is distributed in a Universal Binary format that works on all supported systems.
+</p>
 
 <h2 id="License">License</h2>
 
 <p>The new code that has been added to create, read and write the special, compact format places database is licensed under the GPLv3.  Because the resulting Sol.wdgt is considered a combined work the Sol widget as a whole now falls under the GPLv3 license (see the <a href="LICENSE.txt" target="_blank">LICENSE.txt</a> file for further details).
+</p>
 
 <span class="sidebar">
 <i>Sol 1.2.3 License</i><br />
@@ -385,7 +410,7 @@ The GPLv3 is also available in the <a href="COPYING.txt" target="_blank">COPYING
 <h3 style="text-align: center; margin:0">GNU GENERAL PUBLIC LICENSE</h3>
 <p style="text-align: center;">Version 3, 29 June 2007</p>
 
-<p>Copyright &copy; 2007 Free Software Foundation, Inc.
+<p>Copyright &#169; 2007 Free Software Foundation, Inc.
  &lt;<a href="http://fsf.org/">http://fsf.org/</a>&gt;</p><p>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.</p>
