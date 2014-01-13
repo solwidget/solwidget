@@ -687,6 +687,7 @@ function AdjustClockMidday()
             document.getElementById('middayLine').style.left = String(leftSide + 5) + 'px';
             document.getElementById('middayLine').style.width = String(width) + 'px';
             document.getElementById('middayLine').style.display = 'block';
+            document.getElementById('middayCell').style.display = 'block';
         }
         else
         {
