@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+our $arch = ''; # Set to ppc, ppc64, i386 or x86_64 otherwise will be native
+sub go($;$) {
+  my ($line,$options) = @_;
+  $options = '' if !$options;
+  my $base = $0;
+  $base =~ s|([^/]*/)*||;
+  my $dir = $0;
+  substr($dir,-(length($base)+1)) = '';
+  chdir($dir);
+  my $exe = "/tmp/$base-$ENV{'USER'}-$<($>).binary";
+  my $qfile = __FILE__;
+  $qfile =~ s|\\|\\\\|g;
+  $qfile =~ s|"|\\"|g;
+  unlink($exe);
+  ! -e $exe or die "Cannot remove old $exe";
+  my $archflag = '';
+  $archflag = "-arch $arch" if defined($arch) && $arch ne '';
+  $implib = "-lstdc++";
+  open(GCC,"|gcc -o '$exe' -pipe -g0 -std=gnu++98 $archflag -O2 -x objective-c $options $implib -")
+    or die "Can't run gcc!";
+  print GCC '#line ', $line, " \"$qfile\"\n";
+  while (<DATA>) {
+    print GCC $_;
+  }
+  close(GCC);
+  if (-x $exe) {
+    system("set -m; (sleep 10 && rm -f \"$exe\")& disown");
+    exec $exe __FILE__,@ARGV;
+  }
+  exit(1);
+}
+go(__LINE__+2,'-Wall -framework Cocoa -framework Carbon');
+__END__
+
+#include <stdio.h>
+#import <Foundation/Foundation.h>
+
+int main(int argc, char *argv[])
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    NSString *ans, *format;
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setFormatterBehavior: NSDateFormatterBehavior10_4];
+    [formatter setTimeZone: [NSTimeZone timeZoneForSecondsFromGMT: 0]];
+    [formatter setTimeStyle: NSDateFormatterShortStyle];
+    [formatter setDateStyle: NSDateFormatterNoStyle];
+    format = [formatter dateFormat];
+    ans = [NSString stringWithString: format];
+    [formatter release];
+    //return ans;
+    printf("NSDateFormatterShortTimeStyle => \"%s\"\n", [ans UTF8String]);
+    [pool drain];
+
+    return 0;
+}
