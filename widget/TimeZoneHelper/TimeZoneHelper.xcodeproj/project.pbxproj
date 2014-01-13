@@ -11,7 +11,6 @@
 		27272775122DCF210008690A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 089C1672FE841209C02AAC07 /* Foundation.framework */; };
 		37A940CC09746EED00B6DA5C /* TimeZoneHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 37A940CB09746EED00B6DA5C /* TimeZoneHelper.m */; };
 		37A940E7097471EA00B6DA5C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37A940E6097471EA00B6DA5C /* WebKit.framework */; };
-		37DA486E09992B9600FC8A56 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37DA486D09992B9600FC8A56 /* AddressBook.framework */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -28,7 +27,6 @@
 		37A940CA09746EED00B6DA5C /* TimeZoneHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeZoneHelper.h; sourceTree = "<group>"; };
 		37A940CB09746EED00B6DA5C /* TimeZoneHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeZoneHelper.m; sourceTree = "<group>"; };
 		37A940E6097471EA00B6DA5C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		37DA486D09992B9600FC8A56 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		8D5B49B6048680CD000E48DA /* TimeZoneHelper.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimeZoneHelper.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D2F7E65807B2D6F200F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -41,7 +39,6 @@
 			files = (
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
 				37A940E7097471EA00B6DA5C /* WebKit.framework in Frameworks */,
-				37DA486E09992B9600FC8A56 /* AddressBook.framework in Frameworks */,
 				27272775122DCF210008690A /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -95,7 +92,6 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				37DA486D09992B9600FC8A56 /* AddressBook.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
 				089C1672FE841209C02AAC07 /* Foundation.framework */,
 				37A940E6097471EA00B6DA5C /* WebKit.framework */,

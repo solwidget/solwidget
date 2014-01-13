@@ -35,15 +35,10 @@
 
 #import "TimeZoneHelper.h"
 #import "soldatabase.h"
-#import <AddressBook/AddressBook.h>
 #import <Foundation/Foundation.h>
 #import <WebKit/WebKit.h>
 #import <stdio.h>
 #import <stdlib.h>
-
-#ifndef NSFoundationVersionNumber10_8
-#define NSFoundationVersionNumber10_8 945.00
-#endif
 
 @implementation TimeZoneHelper
 
@@ -273,50 +268,18 @@ static int compare_city(const void *p1, const void *p2)
     return [self formattedZone: [NSTimeZone timeZoneForSecondsFromGMT: 0] timeForDate: dateMillis];
 }
 
-static ABPerson *GetMe(void)
-{
-    /* Avoid accessing the Address Book on 10.8 or later */
-    if (NSFoundationVersionNumber < NSFoundationVersionNumber10_8)
-	return [[ABAddressBook sharedAddressBook] me];
-    else
-	return nil;
-}
-
 - (NSString *)myRegionCode
 {
     const city_entry_t *lastCity = [self lastSelectedCity];
     if (lastCity) return (NSString *)lastCity->db_region;
-
-    ABPerson *me = GetMe();
-    if (!me) return nil;
-
-    ABMultiValue *addresses = [me valueForProperty:kABAddressProperty];
-    NSDictionary *primaryAddress = [addresses valueAtIndex:[addresses indexForIdentifier:[addresses primaryIdentifier]]];
-
-    NSString *countryCodeISO = [[primaryAddress objectForKey:kABAddressCountryCodeKey] uppercaseString];
-
-    if ([countryCodeISO isEqualToString:@"US"])
-    {
-        NSString *stateCode = [primaryAddress objectForKey:kABAddressStateKey];
-        if (! stateCode) return nil;
-        return [NSString stringWithFormat:@"%@/%@", countryCodeISO, stateCode];
-    }
-    else
-        return countryCodeISO;
+    return nil;
 }
 
 - (NSString *)myCityName
 {
     const city_entry_t *lastCity = [self lastSelectedCity];
     if (lastCity) return (NSString *)lastCity->db_city;
-
-    ABPerson *me = GetMe();
-    if (!me) return nil;
-
-    ABMultiValue *addresses = [me valueForProperty:kABAddressProperty];
-    NSDictionary *primaryAddress = [addresses valueAtIndex:[addresses indexForIdentifier:[addresses primaryIdentifier]]];
-
-    return [primaryAddress objectForKey:kABAddressCityKey];
+    return nil;
 }
 
 - (NSString *)lookupPlaceInRegion:(NSString *)region withName:(NSString *)name
