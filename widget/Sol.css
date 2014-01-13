@@ -92,7 +92,7 @@ body
 #container
 {
     width: 224px;
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 
 #containerTable
@@ -103,6 +103,99 @@ body
 #clockCell
 {
     padding: 0;
+}
+
+#clockWrapper
+{
+    position: relative;
+}
+
+#num00,
+#num03,
+#num06,
+#num09,
+#num12,
+#num15,
+#num18,
+#num21
+{
+    position: absolute;
+    display: none;
+    margin: 0;
+    padding: 0;
+    font-size: 9px;
+    font-weight: normal;
+    font-family: Helvetica;
+    width: 16px;
+    white-space: nowrap;
+}
+
+#num00,
+#num12
+{
+    text-align: center;
+}
+
+#num03,
+#num06,
+#num09
+{
+    text-align: right;
+}
+
+#num15,
+#num18,
+#num21
+{
+    text-align: left;
+}
+
+#num00
+{
+    top: 101px;
+    left: 42px;
+}
+
+#num03
+{
+    top: 86px;
+    left: -2px;
+}
+
+#num06
+{
+    top: 45px;
+    left: -17px;
+}
+
+#num09
+{
+    top: 6px;
+    left: -2px;
+}
+
+#num12
+{
+    top: -10px;
+    left: 42px;
+}
+
+#num15
+{
+    top: 6px;
+    left: 86px;
+}
+
+#num18
+{
+    top: 45px;
+    left: 102px;
+}
+
+#num21
+{
+    top: 86px;
+    left: 86px;
 }
 
 #tableWrapper

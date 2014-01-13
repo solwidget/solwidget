@@ -56,7 +56,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <table id="containerTable">
                     <tr>
                         <td id="clockCell">
-                            <canvas id="clock" height="100" width="100" onclick="ToggleClockOnly();"></canvas>
+                            <div id="clockWrapper">
+                                <canvas id="clock" height="100" width="100" onclick="ToggleClockOnly();"></canvas>
+                                <span id="num00"></span>
+                                <span id="num03"></span>
+                                <span id="num06"></span>
+                                <span id="num09"></span>
+                                <span id="num12"></span>
+                                <span id="num15"></span>
+                                <span id="num18"></span>
+                                <span id="num21"></span>
+                            </div>
                         </td>
                         <td id="tableWrapperCell">
                             <div id="tableWrapper">
@@ -420,6 +430,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                         <span id="middaytextline"></span>12:00
                         <input class="ctrl" type="checkbox" id="UTC" onchange="UTCDidChange();" />
                         UTC
+                        <input class="ctrl" type="checkbox" id="numbers" onchange="NumbersDidChange();" />
+			<span id="numbersrange">0..23</span>
                     </td>
                 </tr>
             </table>

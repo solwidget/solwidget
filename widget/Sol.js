@@ -80,6 +80,10 @@ var gShowMidday;
 var gUseUTCTimes;
 
 
+// Whether to show the clock numbers
+var gShowClockNumbers;
+
+
 // Timer for periodic updates.
 
 var gClockTimeout = false;
@@ -189,6 +193,17 @@ function UTCDidChange()
 {
     gUseUTCTimes = document.getElementById('UTC').checked;
     widget.setPreferenceForKey(gUseUTCTimes, widget.identifier + '-useUTC');
+}
+
+
+// -- NumbersDidChange --
+//
+// Handle changes to the show clock face numbers setting
+//
+function NumbersDidChange()
+{
+    gShowClockNumbers = document.getElementById('numbers').checked;
+    widget.setPreferenceForKey(gShowClockNumbers, widget.identifier + '-showNumbers');
 }
 
 
@@ -738,6 +753,72 @@ function WidgetDidHide()
     }
 }
 
+
+// -- SetClockNumbers --
+//
+// Sets the text of the clock face numbers appropriately based
+// on the current short time format and set the checkbox's label as well
+//
+function SetClockNumbers()
+{
+    var dateFormat = window.TimeZoneHelper.formattedTimeFormatString();
+    dateFormat = dateFormat.replace(/''/g, '');
+    dateFormat = dateFormat.replace(/'[^'']+'/g, '');
+    var nums = ['0','3','6','9','12','15','18','21'];
+    var label = '0..23';
+    // See http://unicode.org/reports/tr35/tr35-6.html#Date_Format_Patterns
+    if (dateFormat.match(/hh/))
+    {
+        nums = ['12','03','06','09','12','03','06','09'];
+        label = '01..12';
+    }
+    else if (dateFormat.match(/h/))
+    {
+        nums = ['12','3','6','9','12','3','6','9'];
+        label = '1..12';
+    }
+    else if (dateFormat.match(/HH/))
+    {
+        nums = ['00','03','06','09','12','15','18','21'];
+        label = '00..23';
+    }
+    else if (dateFormat.match(/H/))
+    {
+        nums = ['0','3','6','9','12','15','18','21'];
+        label = '0..23';
+    }
+    else if (dateFormat.match(/KK/))
+    {
+        nums = ['00','03','06','09','00','03','06','09'];
+        label = '00..11';
+    }
+    else if (dateFormat.match(/K/))
+    {
+        nums = ['0','3','6','9','0','3','6','9'];
+        label = '0..11';
+    }
+    else if (dateFormat.match(/kk/))
+    {
+        nums = ['24','03','06','09','12','15','18','21'];
+        label = '01..24';
+    }
+    else if (dateFormat.match(/k/))
+    {
+        nums = ['24','3','6','9','12','15','18','21'];
+        label = '1..24';
+    }
+    SetText('num00', nums[0]);
+    SetText('num03', nums[1]);
+    SetText('num06', nums[2]);
+    SetText('num09', nums[3]);
+    SetText('num12', nums[4]);
+    SetText('num15', nums[5]);
+    SetText('num18', nums[6]);
+    SetText('num21', nums[7]);
+    SetText('numbersrange', label);
+}
+
+
 // -- MillisToDrawRadians --
 //
 // Converts a UTC time in milliseconds since 1970 GMT first to a number of
@@ -757,6 +838,7 @@ function MillisToDrawRadians(millis, hourOffset)
   while (hours <   0.0) hours += 24.0;
   return (hours / 24.0) * 2.0 * Math.PI;
 }
+
 
 // -- Redraw --
 //
@@ -951,6 +1033,60 @@ function Redraw()
         context.fillStyle = '#002F80';
         context.fill();
     }
+    SetClockNumbers();
+    if (gShowClockNumbers)
+    {
+        document.getElementById('placeName').style.bottom = '20px';
+        var moveToPolar = function(r,t) {
+            var x = r * Math.cos(t);
+            var y = r * Math.sin(t);
+            context.moveTo(x, y);
+        };
+        var lineToPolar = function(r,t) {
+            var x = r * Math.cos(t);
+            var y = r * Math.sin(t);
+            context.lineTo(x, y);
+        };
+        context.save();
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.arc(0, 0, 50, 0, 2.0 * Math.PI, false);
+        context.clip();
+        context.strokeStyle = '#686868';
+        context.strokeStyle = '#888888';
+        context.strokeStyle = '#808080';
+        context.globalAlpha = 0.6667;
+        var angle;
+        for (angle = 0; angle < 360; angle += 15) {
+            context.beginPath();
+            var radians = angle * Math.PI / 180;
+            moveToPolar(angle % 45 ? 46 : 44, radians);
+            lineToPolar(51, radians);
+            context.lineWidth = angle % 45 ? 1 : 2;
+            context.stroke();
+        }
+        context.restore();
+        document.getElementById('num00').style.display = 'block';
+        document.getElementById('num03').style.display = 'block';
+        document.getElementById('num06').style.display = 'block';
+        document.getElementById('num09').style.display = 'block';
+        document.getElementById('num12').style.display = 'block';
+        document.getElementById('num15').style.display = 'block';
+        document.getElementById('num18').style.display = 'block';
+        document.getElementById('num21').style.display = 'block';
+    }
+    else
+    {
+        document.getElementById('placeName').style.bottom = '23px';
+        document.getElementById('num00').style.display = 'none';
+        document.getElementById('num03').style.display = 'none';
+        document.getElementById('num06').style.display = 'none';
+        document.getElementById('num09').style.display = 'none';
+        document.getElementById('num12').style.display = 'none';
+        document.getElementById('num15').style.display = 'none';
+        document.getElementById('num18').style.display = 'none';
+        document.getElementById('num21').style.display = 'none';
+    }
     if (gShowMidday && middayRadians)
     {
         // Draw midday line
@@ -1036,6 +1172,7 @@ function WidgetWillRemove()
     widget.setPreferenceForKey(null, widget.identifier + '-twilightZenith');
     widget.setPreferenceForKey(null, widget.identifier + '-showMidday');
     widget.setPreferenceForKey(null, widget.identifier + '-useUTC');
+    widget.setPreferenceForKey(null, widget.identifier + '-showNumbers');
 }
 
 
@@ -1090,6 +1227,7 @@ function SaveSettings()
     gSavedSettings.twilight = document.getElementById('twilight').value;
     gSavedSettings.midday   = document.getElementById('midday').checked;
     gSavedSettings.UTC      = document.getElementById('UTC').checked;
+    gSavedSettings.shownum  = document.getElementById('numbers').checked;
 }
 
 
@@ -1106,9 +1244,11 @@ function RestoreSettings()
     document.getElementById('twilight').value = gSavedSettings.twilight;
     document.getElementById('midday').checked = gSavedSettings.midday;
     document.getElementById('UTC').checked    = gSavedSettings.UTC;
+    document.getElementById('numbers').checked = gSavedSettings.shownum;
     TwilightDidChange();
     MiddayDidChange();
     UTCDidChange();
+    NumbersDidChange();
 }
 
 
@@ -1399,6 +1539,8 @@ function WidgetDidLoad()
     AdjustClockMidday();
     gUseUTCTimes = widget.preferenceForKey(widget.identifier + '-useUTC');
     document.getElementById('UTC').checked = gUseUTCTimes ? true : false;
+    gShowClockNumbers = widget.preferenceForKey(widget.identifier + '-showNumbers');
+    document.getElementById('numbers').checked = gShowClockNumbers ? true : false;
 
 
     // Get location and time zone from preferences, or set to default.

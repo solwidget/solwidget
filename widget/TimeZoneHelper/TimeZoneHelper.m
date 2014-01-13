@@ -169,6 +169,8 @@ static int compare_city(const void *p1, const void *p2)
         return NO;
     if (aSelector == @selector(formattedTimeForDate:))
         return NO;
+    if (aSelector == @selector(formattedTimeFormatString))
+        return NO;
     if (aSelector == @selector(formattedUTCTimeForDate:))
         return NO;
     if (aSelector == @selector(localTimeZoneName))
@@ -202,6 +204,20 @@ static int compare_city(const void *p1, const void *p2)
 - (NSArray *)allTimeZones
 {
     return [NSTimeZone knownTimeZoneNames];
+}
+
+- (NSString *)formattedTimeFormatString
+{
+    NSString *ans, *format;
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setFormatterBehavior: NSDateFormatterBehavior10_4];
+    [formatter setTimeZone: [NSTimeZone timeZoneForSecondsFromGMT: 0]];
+    [formatter setTimeStyle: NSDateFormatterShortStyle];
+    [formatter setDateStyle: NSDateFormatterNoStyle];
+    format = [formatter dateFormat];
+    ans = [NSString stringWithString: format];
+    [formatter release];
+    return ans;
 }
 
 - (void)setTimeZoneWithName:(NSString *)name
